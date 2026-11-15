@@ -410,8 +410,8 @@ The installer, the `dawnmere` command, the Claude Code plugin and the connector 
 ## Related
 
 [memory-bench](https://github.com/LF-Labs-Inc/memory-bench) is an open benchmark for assistant memory, built by the
-same people. It has a Dawnmere row measured on the released engine, with its leaks shown next to its recall; the
-maintainers' other row there is a related system, and the benchmark says so.
+same people. It scores Dawnmere's released versions by the share of cases answered right, with every leak rate shown
+beside it; the maintainers' other row there is a related system, and the benchmark says so.
 
 Found a bug? [Open an issue](https://github.com/LF-Labs-Inc/dawnmere/issues/new/choose) with the output of
 `dawnmere doctor --report`. Security problems go to [SECURITY.md](SECURITY.md).
