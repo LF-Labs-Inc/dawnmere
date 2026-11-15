@@ -312,6 +312,6 @@ Dawnmere は LF Labs（GitHub の [LF-Labs-Inc](https://github.com/LF-Labs-Inc) 
 
 ## 関連プロジェクト
 
-[memory-bench](https://github.com/LF-Labs-Inc/memory-bench) は、アシスタントのメモリを評価するオープンなベンチマークで、同じチームが作っています。公開されているエンジンで測った Dawnmere の行があり、漏れの数と呼び出しの結果が並べて示されています。そこにあるメンテナーのもう一つの行は関連するシステムのもので、ベンチマークにもそう明記されています。
+[memory-bench](https://github.com/LF-Labs-Inc/memory-bench) は、アシスタントのメモリを評価するオープンなベンチマークで、同じチームが作っています。公開されている Dawnmere を、正しく答えられたケースの割合で評価し、その横にすべての漏れの率を示しています。そこにあるメンテナーのもう一つの行は関連するシステムのもので、ベンチマークにもそう明記されています。
 
 バグを見つけたら、`dawnmere doctor --report` の出力を添えて [issue を作成](https://github.com/LF-Labs-Inc/dawnmere/issues/new/choose)してください。セキュリティの問題は [SECURITY.md](SECURITY.md) の手順で報告してください。

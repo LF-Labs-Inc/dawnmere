@@ -312,6 +312,6 @@ Dawnmere 由 LF Labs（GitHub 上的 [LF-Labs-Inc](https://github.com/LF-Labs-In
 
 ## 相关项目
 
-[memory-bench](https://github.com/LF-Labs-Inc/memory-bench) 是一个面向助手记忆的开放基准测试，出自同一批人之手。它有一行 Dawnmere 的数据，测的是已发布的引擎，泄露情况和召回结果并排列出；里面维护者的另一行是一个相关的系统，基准测试里也写明了这一点。
+[memory-bench](https://github.com/LF-Labs-Inc/memory-bench) 是一个面向助手记忆的开放基准测试，出自同一批人之手。它按答对的用例比例给已发布的 Dawnmere 评分，旁边列出每一类泄露率；里面维护者的另一行是一个相关的系统，基准测试里也写明了这一点。
 
 发现 bug？请[提交 issue](https://github.com/LF-Labs-Inc/dawnmere/issues/new/choose)，并附上 `dawnmere doctor --report` 的输出。安全问题请按 [SECURITY.md](SECURITY.md) 私下报告。
