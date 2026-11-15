@@ -11,7 +11,7 @@ database_name = "dawnmere-telemetry"
 database_id = "REPLACE-WITH-THE-D1-ID"
 
 [triggers]
-crons = ["17 3 * * *"]   # daily: delete pings older than 13 months
+crons = ["17 3 * * *"]   # daily: yesterday's totals, then single pings older than 7 days go
 
 [observability]
 enabled = false          # no request logs (they would hold IP addresses)

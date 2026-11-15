@@ -57,6 +57,7 @@ def test_a_ping_holds_counts_and_nothing_a_memory_says(home):
     install_record.save(rec)
     body = telemetry.payload({}, now)
     assert tuple(body) == telemetry.FIELDS
+    assert body["age"] == "0"  # set up just now: months, never the day or week
     assert body["week"] == {"sessions": "1-9", "saves": "1-9", "recalls": "100-999", "forgets": "1-9"}
     assert body["memories"] == "10-99"
     assert body["apps"] == ["codex"]  # names from the fixed list only
@@ -82,21 +83,21 @@ def test_the_id_is_random_and_new_each_month(home):
 def test_nothing_goes_until_someone_says_yes(home):
     sent = []
     assert not telemetry.asked()
-    assert telemetry.ping(post=sent.append) == "off" and sent == []
+    assert telemetry.ping(post=sent.append, shell_check=False) == "off" and sent == []
 
 
 def test_once_a_day_and_a_failure_is_not_retried(home):
     telemetry.choose(True)
     sent = []
     day = time.mktime((2026, 11, 20, 12, 0, 0, 0, 0, -1))
-    assert telemetry.ping(day, post=sent.append) == "sent" and len(sent) == 1
-    assert telemetry.ping(day + 3600, post=sent.append) == "already sent today" and len(sent) == 1
+    assert telemetry.ping(day, post=sent.append, shell_check=False) == "sent" and len(sent) == 1
+    assert telemetry.ping(day + 3600, post=sent.append, shell_check=False) == "already sent today" and len(sent) == 1
     assert json.loads(sent[0])["schema"] == telemetry.SCHEMA
 
     def down(_):
         raise OSError("offline")
-    assert telemetry.ping(day + 86400, post=down).startswith("not sent")
-    assert telemetry.ping(day + 86400 + 60, post=sent.append) == "already sent today"
+    assert telemetry.ping(day + 86400, post=down, shell_check=False).startswith("not sent")
+    assert telemetry.ping(day + 86400 + 60, post=sent.append, shell_check=False) == "already sent today"
 
 
 @pytest.mark.parametrize("env", [{telemetry.OFF_ENV: "0"}, {telemetry.OFF_ENV: "off"}, {"DO_NOT_TRACK": "1"}])
@@ -105,8 +106,9 @@ def test_the_environment_turns_it_off_whatever_was_answered(home, monkeypatch, e
     for k, v in env.items():
         monkeypatch.setenv(k, v)
     sent = []
-    assert telemetry.ping(post=sent.append) == "off" and sent == []
+    assert telemetry.ping(post=sent.append, shell_check=False) == "off" and sent == []
     assert "off" in telemetry.status_text()
+    assert not telemetry.load()["enabled"] and not telemetry.plist_path().exists()  # kept off, agent gone
 
 
 def test_off_takes_the_agent_away_and_on_puts_it_back(home, mac):
@@ -132,8 +134,34 @@ def test_show_prints_the_ping_and_the_next_ping_sends_the_same_id(home, capsys):
     assert cli.main(["telemetry", "show"]) == 0
     shown = json.loads(capsys.readouterr().out.split("\n\n")[0])
     sent = []
-    telemetry.ping(post=sent.append)
+    telemetry.ping(post=sent.append, shell_check=False)
     assert json.loads(sent[0])["id"] == shown["id"]
+
+
+def test_the_daily_agent_reads_the_off_switch_from_the_login_shell(home, monkeypatch):
+    telemetry.choose(True)
+    sent = []
+    shells = {"off": f"motd\n{telemetry.SHELL_MARK}1\t\n", "on": f"{telemetry.SHELL_MARK}\t\n", "broken": "zsh: oops"}
+
+    def zsh(out):
+        return lambda argv, timeout=None: type("R", (), {"ok": True, "out": out, "err": "", "code": 0})()
+    monkeypatch.setattr(telemetry, "run", zsh(shells["broken"]))
+    assert telemetry.ping(post=sent.append).startswith("not sent") and sent == []  # cannot tell: not today
+    monkeypatch.setattr(telemetry, "run", zsh(shells["on"]))
+    assert telemetry.ping(post=sent.append) == "sent" and len(sent) == 1
+    telemetry._save({**telemetry.load(), "last_day": ""})
+    monkeypatch.setattr(telemetry, "run", zsh(shells["off"]))  # DO_NOT_TRACK=1 in ~/.zshrc
+    assert telemetry.ping(post=sent.append).startswith("off") and len(sent) == 1
+    assert not telemetry.load()["enabled"]
+
+
+def test_setup_age_is_months_not_weeks(home):
+    rec = install_record.empty()
+    now = time.time()
+    for days, want in ((3, "0"), (40, "1"), (70, "2"), (100, "3-5"), (200, "6-11"), (400, "12+")):
+        rec["created"] = now - days * 86400
+        install_record.save(rec)
+        assert telemetry._age(now) == want, days
 
 
 # ---------- setup and update

@@ -6,8 +6,12 @@ or a terminal update) and sends nothing until it answers. Off: the `telemetry of
 or DO_NOT_TRACK=1. `telemetry show` prints exactly what would be sent.
 
 What goes out is payload() and nothing else: the fields in FIELDS, the counts as buckets ("10-99"), a random id that
-changes every month (so no install can be followed from one month to the next), and the ISO week this Mac was set up
-(so retention can be counted without following anyone). No memory text, prompt, name, path, project or IP address.
+changes every month, and how long ago this Mac was set up, in coarse ranges (so retention can be counted without
+following anyone). The endpoint keeps single pings for 7 days, then only daily totals. No memory text, prompt, name,
+path, project or IP address.
+
+The environment switches are read from the login shell too: the daily agent runs under launchd, which never sees a
+DO_NOT_TRACK set in ~/.zshrc. A command run with one set turns usage counts off for good (honor_env).
 """
 import json
 import os
@@ -17,7 +21,6 @@ import sys
 import time
 import urllib.request
 import uuid
-from datetime import datetime, timezone
 from importlib import metadata
 from pathlib import Path
 from xml.sax.saxutils import escape
@@ -32,7 +35,8 @@ OFF_ENV = "LFLABS_MEMORY_TELEMETRY"   # 0 / off / false: never send (a company's
 URL_ENV = "LFLABS_MEMORY_TELEMETRY_URL"  # tests only
 LABEL = "com.lflabs.memory.telemetry"
 SCHEMA = 1
-FIELDS = ("schema", "id", "cli", "engine", "macos", "arch", "cohort", "apps", "backend", "week", "memories")
+FIELDS = ("schema", "id", "cli", "engine", "macos", "arch", "age", "apps", "backend", "week", "memories")
+AGES = ("0", "1", "2", "3-5", "6-11", "12+")  # months since setup
 APPS = ("claude-code", "codex", "cursor", "windsurf", "gemini", "copilot", "qwen-code", "kimi-code", "qoder", "iflow",
         "cline")
 QUESTION = (f"Share anonymous usage counts with LF Labs to help improve {PRODUCT}? Never your memories, prompts or "
@@ -76,6 +80,29 @@ def env_off(env=None):
 
 def enabled():
     return bool(load().get("enabled")) and not env_off()
+
+
+SHELL_MARK = "__lflabs_memory_env__"
+
+
+def shell_env():
+    """DO_NOT_TRACK and the off switch as a new Terminal window has them (login, interactive zsh), or None when the
+    shell could not be asked."""
+    r = run(["zsh", "-lic", f'printf "\\n{SHELL_MARK}%s\\t%s\\n" "$DO_NOT_TRACK" "${OFF_ENV}"'], timeout=20)
+    for line in reversed((r.out or "").splitlines()) if r.ok else []:
+        if line.startswith(SHELL_MARK):
+            dnt, off = (line[len(SHELL_MARK):].split("\t") + [""])[:2]
+            return {"DO_NOT_TRACK": dnt, OFF_ENV: off}
+    return None
+
+
+def honor_env():
+    """An off switch seen in the environment is kept: usage counts are turned off and the agent removed, so it holds
+    whether or not the agent's own environment has it. Returns True when it did."""
+    if env_off() and load().get("enabled"):
+        choose(False)
+        return True
+    return False
 
 
 def choose(on, now=None):
@@ -129,13 +156,16 @@ def install_id(state, now):
     return state["id"]
 
 
-def _cohort():
+def _age(now):
+    """Months since setup, as one of AGES (coarse on purpose: with the rest of a ping, an exact week could single out
+    a Mac and link its monthly ids)."""
     rec = install_record.load() or {}
     created = rec.get("created")
     if not isinstance(created, (int, float)):
         return None
-    y, w, _ = datetime.fromtimestamp(created, timezone.utc).isocalendar()
-    return f"{y}-W{w:02d}"
+    months = max(0, int((now - created) // (30.44 * DAY)))
+    return "0" if months < 1 else "1" if months < 2 else "2" if months < 3 else "3-5" if months < 6 else \
+        "6-11" if months < 12 else "12+"
 
 
 def _apps():
@@ -186,16 +216,22 @@ def payload(state=None, now=None):
     mac = platform.mac_ver()[0]
     mac = mac if "." in mac or not mac else mac + ".0"  # always major.minor (the endpoint takes no other shape)
     return {"schema": SCHEMA, "id": install_id(state, now), "cli": _version(CLI_DIST), "engine": _version(ENGINE_DIST),
-            "macos": ".".join(mac.split(".")[:2]) or None, "arch": platform.machine() or None, "cohort": _cohort(),
+            "macos": ".".join(mac.split(".")[:2]) or None, "arch": platform.machine() or None, "age": _age(now),
             "apps": _apps(), "backend": _backend(), "week": week, "memories": total}
 
 
-def ping(now=None, post=None):
+def ping(now=None, post=None, shell_check=True):
     """Send today's ping if it is on and today's has not gone. Returns what happened, in a few words. Never raises:
     a ping that fails is simply not sent; nothing is retried or queued."""
     now = time.time() if now is None else now
-    if not enabled():
+    if honor_env() or not enabled():
         return "off"
+    login = shell_env() if shell_check else {}
+    if login is None:  # could not tell whether the user's shell says off: not today
+        return "not sent (the login shell did not answer)"
+    if env_off(login):
+        choose(False)
+        return "off (the login shell turns it off)"
     state = load()
     day = time.strftime("%Y-%m-%d", time.gmtime(now))
     if state.get("last_day") == day:
@@ -290,6 +326,8 @@ def status_text():
 
 
 def main(action=None, out=print):
+    if action != "ping":
+        honor_env()
     if action in (None, "status"):
         out(status_text())
         return 0

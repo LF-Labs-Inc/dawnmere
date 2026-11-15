@@ -161,6 +161,7 @@ def ask(args, say):
             assume=before if args.yes else None)
     # Usage counts (telemetry.py), asked once: on by default for a new install. An install from before they existed
     # is asked too, but --yes (or no one to ask) leaves it off until it answers.
+    telemetry.honor_env()  # an off switch in the environment is kept, so the daily agent sees it too
     if not telemetry.asked() and not telemetry.env_off():
         new = install_record.load() is None and not settings.path().exists()
         if args.yes:

@@ -405,6 +405,7 @@ def finish(old_version, say=print, get=fetch):
     bump_pins(say)
     say(f"{PRODUCT} is updated ({old_version} to {installed_version()}).")
     # An install from before usage counts existed sends none until it answers: asked here once, at a terminal only
+    telemetry.honor_env()
     if telemetry.ask_once(prompt.yes_no) is not None:
         say(telemetry.status_text().splitlines()[0])
     return 0

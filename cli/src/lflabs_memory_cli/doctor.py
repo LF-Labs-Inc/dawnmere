@@ -378,6 +378,7 @@ def check_backups():
 
 
 def check_telemetry():
+    telemetry.honor_env()
     line = telemetry.status_text().splitlines()[0].removeprefix("Usage counts: ")
     return Check("usage counts", "ok", line)
 

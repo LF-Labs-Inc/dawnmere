@@ -20,7 +20,7 @@ One ping, exactly this shape. `dawnmere telemetry show` prints yours.
   "engine": "0.1.12",
   "macos": "15.2",
   "arch": "arm64",
-  "cohort": "2026-W47",
+  "age": "1",
   "apps": ["claude-code", "codex", "cursor"],
   "backend": "claude-cli",
   "week": {"sessions": "10-99", "saves": "1-9", "recalls": "100-999", "forgets": "0"},
@@ -30,10 +30,10 @@ One ping, exactly this shape. `dawnmere telemetry show` prints yours.
 
 | Field | What it is |
 | --- | --- |
-| `id` | a random id, made on your Mac and replaced every calendar month, so no Mac can be followed from one month to the next |
+| `id` | a random id, made on your Mac and replaced every calendar month; it is only used to count each Mac once a day and a week |
 | `cli`, `engine` | the versions you run |
 | `macos`, `arch` | macOS major and minor version, and the chip (`arm64`) |
-| `cohort` | the week this Mac was set up, so we can see how many installs from each week are still in use without following anyone |
+| `age` | how long ago this Mac was set up, in months: 0, 1, 2, 3-5, 6-11 or 12+, so we can see whether people keep using it |
 | `apps` | which AI apps setup connected, from a fixed list of names |
 | `backend` | what does the background reading: your Claude plan, an API key, or none |
 | `week` | counts for the last 7 days, as ranges (0, 1-9, 10-99, 100-999, ...): AI sessions, saves, memories put into prompts, forgets |
@@ -48,7 +48,8 @@ email or account; anything about other apps on your Mac. The endpoint does not s
 
 - `dawnmere telemetry off` (and `dawnmere telemetry on` to turn it back on)
 - `LFLABS_MEMORY_TELEMETRY=0` or `DO_NOT_TRACK=1` in the environment: nothing is sent, whatever was answered (for
-  a company's Macs, or CI)
+  a company's Macs, or CI). The daily ping also reads them from your login shell (`~/.zprofile`, `~/.zshrc`), and once
+  any `dawnmere` command sees one, usage counts stay off until you turn them on again.
 - `dawnmere telemetry` says whether it is on
 
 ## How it works
@@ -58,4 +59,5 @@ email or account; anything about other apps on your Mac. The endpoint does not s
   hours. It sends at most one ping a day, tries once, and never queues or retries. It is only there while usage counts
   are on, and `dawnmere uninstall` removes it.
 - The ping goes to `https://telemetry.dawnmere.app/v1/ping`. The endpoint's code is in `telemetry/`: it checks each
-  ping against this schema, drops anything else, and keeps the counts with the day they arrived, for 13 months.
+  ping against this schema and drops anything else. It keeps single pings for 7 days (to count weekly users), then
+  only daily totals with no id in them, for 13 months. So there is no long record of any one Mac.
