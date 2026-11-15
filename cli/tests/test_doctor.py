@@ -75,7 +75,8 @@ Codex         ok    MCP + hook (Codex asks you to trust the hook once: /hooks)
 Cursor        ok    MCP, work only (change it: dawnmere access cursor)
 dawnmere      ok    on your PATH
 privacy       ok    memory stored on this Mac; background reading on; Codex sessions off; chat index off; no telemetry
-backups       ok    last local snapshot 6 h ago (1 kept)"""
+backups       ok    last local snapshot 6 h ago (1 kept)
+usage counts  ok    off, not asked yet. `dawnmere telemetry on` to share them."""
 
 
 def run_doctor(**kw):

@@ -66,7 +66,7 @@ flowchart LR
 ## Dawnmere を選ぶ理由
 
 - **アプリごとではなく、メモリはひとつ。** すべてのアプリがひとつのストアを共有するので、Claude Code で保存した事実が、そのまま Cursor が呼び出す事実になります。
-- **保存先はあなたの Mac だけです。** メモリは Library フォルダにあるひとつの SQLite ファイルです。検索は小さなローカルモデルを使って Mac 上で行います。アカウントはなく、LF Labs には何も送られず、ツールが利用データを集めることもありません。
+- **保存先はあなたの Mac だけです。** メモリは Library フォルダにあるひとつの SQLite ファイルです。検索は小さなローカルモデルを使って Mac 上で行います。アカウントはなく、保存した内容が LF Labs に送られることはありません。送られるのは 1 日 1 回の匿名の利用カウントだけで、内容の確認もオフにすることもできます（[TELEMETRY.md](TELEMETRY.md)）。
 - **読み取りには、あなた自身のモデルを使います。** 自動保存には、Claude Code 経由のあなたの Claude プランか、あなた自身の Anthropic API キーを使います。モデルなしで動かすこともできます。
 - **各アプリが見られるのは、あなたが許可した範囲だけ。** Cursor は最初は仕事用のメモしか見られません。新しく接続したアプリも同じです。Claude Code と Claude Desktop のメモリツール、そして名前を名乗るだけのアプリも、今のところ仕事用のメモしか見られません。Claude Code がプロンプトに自動で挿入する呼び出しは、引き続きすべてを見られます。アプリが見られる範囲を広げるには、あなた自身がターミナルで操作する必要があります。`dawnmere access cursor everything` を実行し、アプリの名前をもう一度入力して、macOS のダイアログで「Allow」をクリックします。チャットで頼んでも、このコマンドが返ってくるだけです。
   <!-- checked against v0.1.6 (406ee39/c3ed5b1): MCP tools of Claude Code, Claude Desktop and self-named apps see
@@ -80,8 +80,8 @@ flowchart LR
 - **セットアップは元に戻せます。** 何かを変える前に必ず確認し、触れるファイルはすべてバックアップします。`--dry-run` で計画だけを表示でき、`dawnmere uninstall` でファイルを元に戻せます。
 
 <!-- Local store and models: engine METADATA "SQLite + vectors + keyword search", models.json (bge-small, MiniLM
-     reranker, optional sense model). No usage data: no telemetry code in the CLI; the engine turns off onnxruntime's
-     telemetry (mem.py:206-208). Access defaults: settings.py:9 new_clients "work"; setup.py:100,135-137 Cursor
+     reranker, optional sense model). Usage counts: cli telemetry.py only (on for a new install, asked once for an
+     older one; TELEMETRY.md); the engine sends none and turns off onnxruntime's telemetry (mem.py:206-208). Access defaults: settings.py:9 new_clients "work"; setup.py:100,135-137 Cursor
      personal notes off unless you say yes. Backups and record: setup.py:6, edits.py, uninstall.py:44-72. -->
 
 ## ほかのツールとの比較
@@ -256,8 +256,9 @@ Claude Code も独自のメモリファイル（`~/.claude/projects/` 以下）�
 
 ## Mac の外に出るもの
 
-あなたのメモリが私たちのもとへアップロードされることはなく、LF Labs には何も送られません。Mac の外に出るものは次のとおりです。
+あなたのメモリが私たちのもとへアップロードされることはありません。Mac の外に出るものは次のとおりです。
 
+- **利用カウント**（新しいインストールではオン。0.2.0 より前のインストールでは先に確認します）：多くても 1 日 1 回、毎月変わるランダムな ID、バージョン、接続している AI アプリ、いくつかの件数（範囲で表したもの）を LF Labs に送ります。メモリ、プロンプト、ファイルの中身は決して送りません。`dawnmere telemetry show` で内容を表示し、`dawnmere telemetry off` で止められます（[TELEMETRY.md](TELEMETRY.md)）。
 - **バックグラウンドでの読み取り**（モデルを選んだ場合）：あなたの Claude Code の会話を、あなた自身のプロバイダー（Claude Code 経由のあなたの Claude プラン、またはあなたのキーでの Anthropic API）に送ります。送るのは、あなたのメッセージ 6 件ごとと、セッションの操作がしばらく止まったときで、関連するメモリを最大 8 件添えます。その中には Codex や Cursor から保存されたものが含まれることもあります。ほかに、整理待ちのメモリ、Claude Code や Codex で入力した英語以外のプロンプト（英語で検索するため）、忘れさせたものの言葉（最大 24 時間）も送ります。週に一度（セットアップの少しあとにも一度）、ほぼ同じ内容のメモリ、古くなったと読めるメモリ、日付つきの状況メモを、それぞれ関連するメモリ数件と一緒に送り、統合・書き直し・無効化を行います。これらすべてを合わせて 1 日あたり最大 200 回です。モデルがなければ、これらは何も送られません。
 - **GitHub**：release とアップデート。GitHub の `gh` がインストール済みでログインしていれば、作業中のリポジトリのオープンな pull request も取得します。
 - **ダウンロード**：uv、Python、エンジンが使う Python パッケージ（GitHub と PyPI から）、検索モデルと Claude Code プラグイン（このリポジトリとその release から）、コネクタ（npm から一度ダウンロードし、アプリが起動するたびに npm に問い合わせます）。`dawnmere update` は GitHub に最新の release を問い合わせます。

@@ -29,6 +29,7 @@ def box(mac, monkeypatch, tmp_path):
     short = Path(tempfile.mkdtemp(prefix="lfs", dir="/tmp"))
     data = short / "data"
     monkeypatch.setenv("LFLABS_MEMORY_HOME", str(data))
+    monkeypatch.setenv("LFLABS_MEMORY_TELEMETRY", "0")  # usage counts have their own tests (test_telemetry.py)
     state = short / "engine-state.json"
     monkeypatch.setenv("FAKE_ENGINE_STATE", str(state))
     engine = mac.bin / "lflabs-memory"

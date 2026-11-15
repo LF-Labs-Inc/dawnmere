@@ -66,7 +66,7 @@ flowchart LR
 ## 为什么用 Dawnmere
 
 - **一份记忆，而不是每个应用各存一份。** 所有应用共用同一个存储，你在 Claude Code 里存下的事实，就是 Cursor 召回的那一条。
-- **只存在你的 Mac 上。** 记忆就是你“资源库”（Library）文件夹里的一个 SQLite 文件。搜索用小型本地模型在你的 Mac 上完成。不需要账号，不会向 LF Labs 发送任何东西，工具本身也不收集使用数据。
+- **只存在你的 Mac 上。** 记忆就是你“资源库”（Library）文件夹里的一个 SQLite 文件。搜索用小型本地模型在你的 Mac 上完成。不需要账号，你保存的内容绝不会发送给 LF Labs：发送的只有每天一次的匿名使用计数，你可以随时查看或关闭（[TELEMETRY.md](TELEMETRY.md)）。
 - **由你自己的模型来读。** 自动保存通过 Claude Code 使用你的 Claude 订阅，或者用你自己的 Anthropic API 密钥。也可以完全不用模型。
 - **每个应用只能看到你允许的内容。** Cursor 一开始只能看到工作笔记，新接入的应用也只能看到工作笔记。Claude Code 和 Claude Desktop 的记忆工具，以及只报出自己名字的应用，目前都只能看到工作笔记。Claude Code 在提示词里的自动召回仍然能看到全部内容。放宽某个应用能看到的范围需要你本人在终端里操作：运行 `dawnmere access cursor everything`，再输入一遍应用的名字，然后在 macOS 弹出的对话框里点 “Allow”。在聊天里提这个要求，只会得到这条命令。
   <!-- checked against v0.1.6 (406ee39/c3ed5b1): MCP tools of Claude Code, Claude Desktop and self-named apps see
@@ -80,8 +80,8 @@ flowchart LR
 - **安装可以撤销。** 改动任何东西之前都会先问你，动到的每个文件都会备份，可以用 `--dry-run` 先看它打算做什么，`dawnmere uninstall` 会把文件恢复原样。
 
 <!-- Local store and models: engine METADATA "SQLite + vectors + keyword search", models.json (bge-small, MiniLM
-     reranker, optional sense model). No usage data: no telemetry code in the CLI; the engine turns off onnxruntime's
-     telemetry (mem.py:206-208). Access defaults: settings.py:9 new_clients "work"; setup.py:100,135-137 Cursor
+     reranker, optional sense model). Usage counts: cli telemetry.py only (on for a new install, asked once for an
+     older one; TELEMETRY.md); the engine sends none and turns off onnxruntime's telemetry (mem.py:206-208). Access defaults: settings.py:9 new_clients "work"; setup.py:100,135-137 Cursor
      personal notes off unless you say yes. Backups and record: setup.py:6, edits.py, uninstall.py:44-72. -->
 
 ## 和其他方案比较
@@ -256,8 +256,9 @@ Claude Code 自己也会保存记忆文件（在 `~/.claude/projects/` 下）。
 
 ## 哪些东西会离开你的 Mac
 
-你的记忆绝不会上传给我们，也不会向 LF Labs 发送任何东西。会离开你 Mac 的有：
+你的记忆绝不会上传给我们。会离开你 Mac 的有：
 
+- **使用计数**（新安装默认开启；0.2.0 之前的安装会先询问你）：每天最多一次，向 LF Labs 发送一个每月更换的随机 ID、版本号、已连接的 AI 应用，以及几项以范围表示的计数。绝不发送任何记忆、提示词或文件的内容。`dawnmere telemetry show` 显示发送内容，`dawnmere telemetry off` 将其关闭（[TELEMETRY.md](TELEMETRY.md)）。
 - **后台阅读**（如果你选了模型）：会把你的 Claude Code 对话发给你自己的模型提供方（通过 Claude Code 使用你的 Claude 订阅，或用你的密钥调用 Anthropic API），时机是你每发 6 条消息之后以及会话空闲时，并附上最多 8 条相关记忆，其中可能包括从 Codex 或 Cursor 存下的记忆。它还会发送等待归档的记忆、在 Claude Code 或 Codex 里输入的非英文提示词（以便用英文搜索），以及你遗忘的内容的文字（最多 24 小时）。每周一次（setup 之后不久也会有一次），它还会发送内容几乎相同的记忆、读起来已经过时的记忆和带日期的状态记录，每条附上几条相关记忆，用来合并、改写或停用它们。以上合计每天最多 200 次调用；不用模型时，这些都不会发送。
 - **GitHub**：获取 release 和更新；如果装了 GitHub 的 `gh` 并已登录，还会获取你当前所在仓库的未关闭 pull request。
 - **下载**：uv、Python 和引擎依赖的 Python 包（来自 GitHub 和 PyPI）；搜索模型和 Claude Code 插件（来自本仓库及其 release）；连接器（从 npm 下载一次，之后应用每次启动它时会向 npm 查询）。`dawnmere update` 会向 GitHub 查询最新 release。

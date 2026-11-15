@@ -21,7 +21,7 @@ from importlib import metadata
 from pathlib import Path
 
 from . import (access, apps, backend, claude_settings, edits, install_record, keychain, launchd, layout, models,
-               prompt, screen, settings, sockets)
+               prompt, screen, settings, sockets, telemetry)
 from .brand import COMMAND, PRODUCT, REPO
 from .layout import (CLI_DIST, CONNECTOR_VERSION, ENGINE, ENGINE_DIST, MARKETPLACE, OLD_MARKETPLACE, OLD_SERVER,
                      SERVER, data_dir, engine_bin, engine_record, find_claude, git_available, home, lf_labs_dir, on_shell_path, path_advice, short, uv_bin)
@@ -107,6 +107,7 @@ class Answers:
         self.codex_sessions = False
         self.apps = list(apps.DEFAULT)
         self.cursor_personal = False  # Cursor starts at work only unless the user says yes
+        self.telemetry = None         # usage counts (telemetry.py): None leaves them as they are
 
 
 def ask(args, say):
@@ -158,6 +159,14 @@ def ask(args, say):
         a.import_notes = a.claude_notes = prompt.yes_no(
             "Import the notes Claude Code already keeps in ~/.claude/projects/*/memory?", before,
             assume=before if args.yes else None)
+    # Usage counts (telemetry.py), asked once: on by default for a new install. An install from before they existed
+    # is asked too, but --yes (or no one to ask) leaves it off until it answers.
+    if not telemetry.asked() and not telemetry.env_off():
+        new = install_record.load() is None and not settings.path().exists()
+        if args.yes:
+            a.telemetry = True if new else None
+        elif sys.stdin.isatty():
+            a.telemetry = prompt.yes_no(telemetry.QUESTION, True)
     return a
 
 
@@ -656,6 +665,9 @@ def dry_run(a, say):
                                   else "work notes only"))
     if a.import_notes:
         say(f"\n  import {len(list(claude_notes()))} notes from ~/.claude/projects/*/memory")
+    if a.telemetry:
+        say(f"\n  share anonymous usage counts once a day: write {short(telemetry.plist_path())} "
+            f"(`{COMMAND} telemetry show` prints what is sent)")
     say(f"\n  record every change in {short(install_record.install_json())}")
     return 0
 
@@ -773,6 +785,10 @@ def main(args, say=print):
                                   keep=settings.raw(), claude_notes=a.claude_notes))
     record["versions"] = {"cli": _version(CLI_DIST), "engine": _version(ENGINE_DIST), "connector": CONNECTOR_VERSION}
     install_record.save(record)
+    if a.telemetry is not None:
+        telemetry_note = telemetry.choose(a.telemetry)
+        if telemetry_note:
+            say(f"Note: {telemetry_note}.")
     work = RealSetup(a, record, say)
     work.problem = node
     code = play(work, intro=intro, plain=args.plain, animate=not args.no_animation)
@@ -795,6 +811,7 @@ def main(args, say=print):
              "anthropic-api": f"Background reading: your Anthropic API key ({model}), up to "
                               f"{settings.DEFAULTS['llm']['daily_calls']} calls a day",
              "none": f"Background reading: off ({backend.NONE_LOSES})"}[a.backend])
+        say(telemetry.status_text().splitlines()[0])
         say(f"`{COMMAND} doctor` checks everything. `{COMMAND} uninstall` removes it all.")
     if not on_shell_path():
         say("\n" + path_advice())

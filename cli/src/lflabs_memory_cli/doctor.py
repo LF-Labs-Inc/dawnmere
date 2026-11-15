@@ -9,7 +9,7 @@ import time
 from dataclasses import asdict, dataclass
 from importlib import metadata
 
-from . import apps, backend, claude_settings, launchd, layout, models, settings, sockets
+from . import apps, backend, claude_settings, launchd, layout, models, settings, sockets, telemetry
 from .brand import COMMAND
 from .layout import (CONNECTOR, CONNECTOR_VERSION, ENGINE, ENGINE_DIST, OLD_SERVER, SERVER, data_dir, engine_bin, home,
                      short)
@@ -377,6 +377,11 @@ def check_backups():
                  "is the background service running? (engine line above)" if state == "warn" else "")
 
 
+def check_telemetry():
+    line = telemetry.status_text().splitlines()[0].removeprefix("Usage counts: ")
+    return Check("usage counts", "ok", line)
+
+
 def checks(ping=True):
     cfg = settings.load()
     db = _db()
@@ -386,7 +391,7 @@ def checks(ping=True):
         return [check_engine(), check_data(db), check_models(), check_hook(), check_connector(),
                 check_node(node, on_npm), check_model(cfg, ping), check_budget(db, cfg), check_backlog(db),
                 *(_no_tools(c, node, on_npm) for c in (check_claude(), check_codex(), check_cursor(), *check_mcp_only())),
-                check_command(), check_privacy(cfg), check_backups(), *check_held()]
+                check_command(), check_privacy(cfg), check_backups(), *check_held(), check_telemetry()]
     finally:
         if db is not None:
             db.close()

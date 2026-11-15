@@ -71,7 +71,8 @@ Every app also gets four tools through MCP: `recall`, `remember`, `forget` and `
 - **One memory, not one per app.** The apps share a single store, so a fact saved from Claude Code is the same
   fact Cursor recalls.
 - **Stored only on your Mac.** The memory is one SQLite file in your Library folder. Search runs on your Mac with
-  small local models. There is no account, nothing is sent to LF Labs, and the tool collects no usage data.
+  small local models. There is no account, and nothing you saved is ever sent to LF Labs: only anonymous usage
+  counts, once a day, which you can see and turn off ([TELEMETRY.md](TELEMETRY.md)).
 - **Your own model does the reading.** Automatic saving uses your Claude plan through Claude Code, or your own
   Anthropic API key. You can also run with no model at all.
 - **Each app sees what you allow.** Cursor starts with work notes only, and a new app sees work notes only.
@@ -95,8 +96,8 @@ Every app also gets four tools through MCP: `recall`, `remember`, `forget` and `
   `--dry-run`, and `dawnmere uninstall` puts the files back.
 
 <!-- Local store and models: engine METADATA "SQLite + vectors + keyword search", models.json (bge-small, MiniLM
-     reranker, optional sense model). No usage data: no telemetry code in the CLI; the engine turns off onnxruntime's
-     telemetry (mem.py:206-208). Access defaults: settings.py:9 new_clients "work"; setup.py:100,135-137 Cursor
+     reranker, optional sense model). Usage counts: cli telemetry.py only (on for a new install, asked once for an
+     older one; TELEMETRY.md); the engine sends none and turns off onnxruntime's telemetry (mem.py:206-208). Access defaults: settings.py:9 new_clients "work"; setup.py:100,135-137 Cursor
      personal notes off unless you say yes. Backups and record: setup.py:6, edits.py, uninstall.py:44-72. -->
 
 ## How it compares
@@ -322,8 +323,12 @@ usually does that for you; from another app or Terminal, remove it yourself.
 
 ## What leaves your Mac
 
-Your memory is never uploaded to us, and nothing is sent to LF Labs. What leaves your Mac:
+Your memory is never uploaded to us. What leaves your Mac:
 
+- **Usage counts** (on for a new install; an install from before 0.2.0 is asked first): at most once a day, to LF
+  Labs, a random id that changes every month, your versions, which AI apps are connected and a few counts as ranges.
+  Never what a memory, prompt or file says. `dawnmere telemetry show` prints it, `dawnmere telemetry off` stops it
+  ([TELEMETRY.md](TELEMETRY.md)).
 - **Background reading**, if you chose a model, sends your own provider (your Claude plan through Claude Code, or the
   Anthropic API with your key) your Claude Code conversations, after every 6 of your messages and when a session goes
   quiet, with up to 8 related memories, which can include ones saved from Codex or Cursor. It also sends memories

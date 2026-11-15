@@ -4,3 +4,4 @@ The public distribution repo is the one deliberate exception (spec 1): GitHub re
 PRODUCT = "Dawnmere"
 COMMAND = "dawnmere"
 REPO = "LF-Labs-Inc/dawnmere"
+TELEMETRY_URL = "https://telemetry.dawnmere.app/v1/ping"  # usage counts (telemetry.py, TELEMETRY.md)

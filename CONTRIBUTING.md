@@ -16,6 +16,7 @@ spend time on it. Security problems go through [SECURITY.md](SECURITY.md), never
 | `cli/` | the `dawnmere` command (Python): setup, doctor, update, uninstall |
 | `connector/` | `dawnmere-connector`, the MCP server each app runs (TypeScript, published to npm) |
 | `plugin/` | the Claude Code plugin: its hooks and MCP entry |
+| `telemetry/` | the endpoint that receives usage counts ([TELEMETRY.md](TELEMETRY.md)): a Cloudflare Worker |
 
 The memory engine (storage, search, screening) is a separate repo,
 [dawnmere-engine](https://github.com/LF-Labs-Inc/dawnmere-engine). The CLI's tests expect it checked out next
