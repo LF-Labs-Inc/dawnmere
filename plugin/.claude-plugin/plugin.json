@@ -13,5 +13,8 @@
     "memory",
     "mcp",
     "cross-app"
-  ]
+  ],
+  "documentationUrl": "https://github.com/LF-Labs-Inc/dawnmere#readme",
+  "privacyPolicyUrl": "https://dawnmere.app/privacy",
+  "supportUrl": "https://github.com/LF-Labs-Inc/dawnmere/issues/new/choose"
 }
