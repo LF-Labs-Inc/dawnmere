@@ -363,7 +363,7 @@ def check_privacy(cfg):
     model (their Claude plan or API key)."""
     p, on = cfg["privacy"], lambda x: "on" if x else "off"
     return Check("privacy", "ok", f"memory stored on this Mac; background reading {on(cfg['llm']['backend'] != 'none')}; "
-                 f"Codex sessions {on(p['codex_sessions'])}; chat index {on(p['chat_index'])}; no telemetry")
+                 f"Codex sessions {on(p['codex_sessions'])}; chat index {on(p['chat_index'])}")
 
 
 def check_backups():
