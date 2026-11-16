@@ -71,8 +71,8 @@ Every app also gets four tools through MCP: `recall`, `remember`, `forget` and `
 - **One memory, not one per app.** The apps share a single store, so a fact saved from Claude Code is the same
   fact Cursor recalls.
 - **Stored only on your Mac.** The memory is one SQLite file in your Library folder. Search runs on your Mac with
-  small local models. There is no account, and nothing you saved is ever sent to LF Labs: only anonymous usage
-  counts, once a day, which you can see and turn off ([TELEMETRY.md](TELEMETRY.md)).
+  small local models. There is no account, and no memory, prompt or file of yours is ever sent to LF Labs: only
+  anonymous usage counts, once a day, which you can see and turn off ([TELEMETRY.md](TELEMETRY.md)).
 - **Your own model does the reading.** Automatic saving uses your Claude plan through Claude Code, or your own
   Anthropic API key. You can also run with no model at all.
 - **Each app sees what you allow.** Cursor starts with work notes only, and a new app sees work notes only.
@@ -285,7 +285,7 @@ removes either name.
 | `dawnmere doctor` | check that everything works, Node.js included, one line per check, with what to do about each problem |
 | `dawnmere export` | save your memory to `~/Downloads/dawnmere-export-<date>.json` (`--format md` for Markdown) |
 | `dawnmere import FILE` | add the memories from an export file, skipping any already there; they count as app saves until you confirm them in one macOS dialog |
-| `dawnmere access APP [LEVEL]` | show what an app may see, or change it: `everything`, `work` or `nothing` (only Cursor and Codex can be widened from here) |
+| `dawnmere access APP [LEVEL]` | show what an app may see, or change it: `everything`, `work` or `nothing` (`nothing-personal` works like `work`; only Cursor and Codex can be widened from here) |
 | `dawnmere update` | install the newest release, checked against its checksums |
 | `dawnmere uninstall` | remove everything setup added |
 | `dawnmere held` | app saves kept out of your prompts until you confirm them, with the line that confirms each |
@@ -323,7 +323,7 @@ usually does that for you; from another app or Terminal, remove it yourself.
 
 ## What leaves your Mac
 
-Your memory is never uploaded to us. What leaves your Mac:
+Your memory is never uploaded to us, and no memory, prompt or file of yours is sent to LF Labs. What leaves your Mac:
 
 - **Usage counts** (on for a new install; an install from before 0.2.0 is asked first): at most once a day, to LF
   Labs, a random id that changes every month, your versions, which AI apps are connected and a few counts as ranges.
@@ -331,13 +331,18 @@ Your memory is never uploaded to us. What leaves your Mac:
   ([TELEMETRY.md](TELEMETRY.md)).
 - **Background reading**, if you chose a model, sends your own provider (your Claude plan through Claude Code, or the
   Anthropic API with your key) your Claude Code conversations, after every 6 of your messages and when a session goes
-  quiet, with up to 8 related memories, which can include ones saved from Codex or Cursor. It also sends memories
+  quiet, with up to 8 related memories, which can include ones saved from Codex or Cursor. With
+  `dawnmere setup --codex-sessions`, it also reads Codex's own session files (`~/.codex/sessions`) and sends those
+  conversations the same way; with that setting off, typing a handoff phrase such as "hand off" in Codex still sends
+  that Codex conversation. It also sends memories
   waiting to be filed, a prompt not in English typed in Claude Code or Codex (to search it in English), and for up to 24 hours the
   words of something you forgot. Once a week, and once soon after setup, it also sends memories that say nearly the
   same thing, memories that read as out of date and dated status notes, each with a few related memories, to merge,
   rewrite or retire them. At most 200 calls a day in all; with no model, none of this is sent.
 - **GitHub**: releases and updates, and, if GitHub's `gh` is installed and logged in, the open pull requests of the
-  repo you are working in.
+  repo you are working in and the state of its recent ones. They are for the short "Where you left off" block at the
+  start of a new chat (open pull requests and what waits on you, running jobs, uncommitted work and the last session's
+  notes), which goes into that app's prompt. Logging out of `gh` stops the GitHub part.
 - **Downloads**: uv, Python and the engine's Python packages (from GitHub and PyPI); the search models and the Claude
   Code plugin (from this repo's releases and repo); the connector (from npm: downloaded once, and npm is checked when an app starts it). `dawnmere update`
   asks GitHub for the newest release.
@@ -397,7 +402,8 @@ programs use the LF Labs name, so these are all Dawnmere:
   needs "remember that ..." (in Chinese "记住：...", in Japanese "覚えておいて：..."). Other languages are found much
   less reliably for now.
 - **Saving is strongest from Claude Code.** In Codex, say "remember that ..."; in Cursor, the model has to call
-  `remember`. Codex's own session files are read only if you run `dawnmere setup --codex-sessions`.
+  `remember`. Codex's own session files are read only if you run `dawnmere setup --codex-sessions`, or for one
+  conversation when you type a handoff phrase in it.
 - **Screening is automatic and can miss things.** Review what your apps save with `dawnmere export`.
 - **Early beta.** Releases are cut by hand and come often; read the
   [release notes](https://github.com/LF-Labs-Inc/dawnmere/releases) before updating.
@@ -415,8 +421,8 @@ The installer, the `dawnmere` command, the Claude Code plugin and the connector 
 ## Related
 
 [memory-bench](https://github.com/LF-Labs-Inc/memory-bench) is an open benchmark for assistant memory, built by the
-same people. It has a Dawnmere row measured on the released engine, with its leaks shown next to its recall; the
-maintainers' other row there is a related system, and the benchmark says so.
+same people. It scores Dawnmere's released versions by the share of cases answered right, with every leak rate shown
+beside it; the maintainers' other row there is a related system, and the benchmark says so.
 
 Found a bug? [Open an issue](https://github.com/LF-Labs-Inc/dawnmere/issues/new/choose) with the output of
 `dawnmere doctor --report`. Security problems go to [SECURITY.md](SECURITY.md).

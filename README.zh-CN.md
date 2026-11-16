@@ -66,7 +66,7 @@ flowchart LR
 ## 为什么用 Dawnmere
 
 - **一份记忆，而不是每个应用各存一份。** 所有应用共用同一个存储，你在 Claude Code 里存下的事实，就是 Cursor 召回的那一条。
-- **只存在你的 Mac 上。** 记忆就是你“资源库”（Library）文件夹里的一个 SQLite 文件。搜索用小型本地模型在你的 Mac 上完成。不需要账号，你保存的内容绝不会发送给 LF Labs：发送的只有每天一次的匿名使用计数，你可以随时查看或关闭（[TELEMETRY.md](TELEMETRY.md)）。
+- **只存在你的 Mac 上。** 记忆就是你“资源库”（Library）文件夹里的一个 SQLite 文件。搜索用小型本地模型在你的 Mac 上完成。不需要账号，你的记忆、提示词和文件绝不会发送给 LF Labs：发送的只有每天一次的匿名使用计数，你可以随时查看或关闭（[TELEMETRY.md](TELEMETRY.md)）。
 - **由你自己的模型来读。** 自动保存通过 Claude Code 使用你的 Claude 订阅，或者用你自己的 Anthropic API 密钥。也可以完全不用模型。
 - **每个应用只能看到你允许的内容。** Cursor 一开始只能看到工作笔记，新接入的应用也只能看到工作笔记。Claude Code 和 Claude Desktop 的记忆工具，以及只报出自己名字的应用，目前都只能看到工作笔记。Claude Code 在提示词里的自动召回仍然能看到全部内容。放宽某个应用能看到的范围需要你本人在终端里操作：运行 `dawnmere access cursor everything`，再输入一遍应用的名字，然后在 macOS 弹出的对话框里点 “Allow”。在聊天里提这个要求，只会得到这条命令。
   <!-- checked against v0.1.6 (406ee39/c3ed5b1): MCP tools of Claude Code, Claude Desktop and self-named apps see
@@ -229,7 +229,7 @@ sh install.sh
 | `dawnmere doctor` | 检查一切是否正常（包括 Node.js），每项检查一行，并给出每个问题的处理办法 |
 | `dawnmere export` | 把记忆导出到 `~/Downloads/dawnmere-export-<date>.json`（加 `--format md` 导出为 Markdown） |
 | `dawnmere import FILE` | 从导出文件中添加记忆，已有的会跳过；在你通过一个 macOS 对话框确认之前，它们都算作应用保存的内容 |
-| `dawnmere access APP [LEVEL]` | 查看或修改某个应用能看到的范围：`everything`、`work` 或 `nothing`（在这里只能放宽 Cursor 和 Codex） |
+| `dawnmere access APP [LEVEL]` | 查看或修改某个应用能看到的范围：`everything`、`work` 或 `nothing`（`nothing-personal` 与 `work` 相同；在这里只能放宽 Cursor 和 Codex） |
 | `dawnmere update` | 安装最新 release，并用它的校验值校验 |
 | `dawnmere uninstall` | 移除 setup 添加的一切 |
 | `dawnmere held` | 列出在你确认之前不会进入提示词的应用保存，以及确认每一条要用的那行命令 |
@@ -256,11 +256,11 @@ Claude Code 自己也会保存记忆文件（在 `~/.claude/projects/` 下）。
 
 ## 哪些东西会离开你的 Mac
 
-你的记忆绝不会上传给我们。会离开你 Mac 的有：
+你的记忆绝不会上传给我们，你的记忆、提示词和文件也不会发送给 LF Labs。会离开你 Mac 的有：
 
 - **使用计数**（新安装默认开启；0.2.0 之前的安装会先询问你）：每天最多一次，向 LF Labs 发送一个每月更换的随机 ID、版本号、已连接的 AI 应用，以及几项以范围表示的计数。绝不发送任何记忆、提示词或文件的内容。`dawnmere telemetry show` 显示发送内容，`dawnmere telemetry off` 将其关闭（[TELEMETRY.md](TELEMETRY.md)）。
-- **后台阅读**（如果你选了模型）：会把你的 Claude Code 对话发给你自己的模型提供方（通过 Claude Code 使用你的 Claude 订阅，或用你的密钥调用 Anthropic API），时机是你每发 6 条消息之后以及会话空闲时，并附上最多 8 条相关记忆，其中可能包括从 Codex 或 Cursor 存下的记忆。它还会发送等待归档的记忆、在 Claude Code 或 Codex 里输入的非英文提示词（以便用英文搜索），以及你遗忘的内容的文字（最多 24 小时）。每周一次（setup 之后不久也会有一次），它还会发送内容几乎相同的记忆、读起来已经过时的记忆和带日期的状态记录，每条附上几条相关记忆，用来合并、改写或停用它们。以上合计每天最多 200 次调用；不用模型时，这些都不会发送。
-- **GitHub**：获取 release 和更新；如果装了 GitHub 的 `gh` 并已登录，还会获取你当前所在仓库的未关闭 pull request。
+- **后台阅读**（如果你选了模型）：会把你的 Claude Code 对话发给你自己的模型提供方（通过 Claude Code 使用你的 Claude 订阅，或用你的密钥调用 Anthropic API），时机是你每发 6 条消息之后以及会话空闲时，并附上最多 8 条相关记忆，其中可能包括从 Codex 或 Cursor 存下的记忆。如果运行了 `dawnmere setup --codex-sessions`，它还会读取 Codex 自己的会话文件（`~/.codex/sessions`），并以同样的方式发送这些对话；这个设置关闭时，在 Codex 里输入 "hand off" 之类的交接用语，仍会发送那次 Codex 对话。它还会发送等待归档的记忆、在 Claude Code 或 Codex 里输入的非英文提示词（以便用英文搜索），以及你遗忘的内容的文字（最多 24 小时）。每周一次（setup 之后不久也会有一次），它还会发送内容几乎相同的记忆、读起来已经过时的记忆和带日期的状态记录，每条附上几条相关记忆，用来合并、改写或停用它们。以上合计每天最多 200 次调用；不用模型时，这些都不会发送。
+- **GitHub**：获取 release 和更新；如果装了 GitHub 的 `gh` 并已登录，还会获取你当前所在仓库的未关闭 pull request，以及它最近的 pull request 的状态。它们用于新对话开头那段简短的 “Where you left off”（未关闭的 pull request 和等你处理的事、正在运行的任务、未提交的改动、上次会话的记录），这段内容会放进该应用的提示词。退出 `gh` 的登录，GitHub 这部分就会停止。
 - **下载**：uv、Python 和引擎依赖的 Python 包（来自 GitHub 和 PyPI）；搜索模型和 Claude Code 插件（来自本仓库及其 release）；连接器（从 npm 下载一次，之后应用每次启动它时会向 npm 查询）。`dawnmere update` 会向 GitHub 查询最新 release。
 - **setup 检查模型**：向 Claude Code 或 Anthropic API 发一次简短的测试调用。
 - **安装命令**：dawnmere.app 会统计安装脚本每一次被获取（获取它的工具、来源网站和国家；不保留 IP 地址），然后转到 GitHub。网站自身的统计见它的[隐私页面](https://dawnmere.app/privacy)。
@@ -301,7 +301,7 @@ Dawnmere 由 LF Labs（GitHub 上的 [LF-Labs-Inc](https://github.com/LF-Labs-In
 - **只支持 Mac**：Apple 芯片，macOS 14 或更高版本。引擎用的 ONNX 运行时没有 Intel Mac 版本，也没有 Linux 或 Windows 版。
 - **只限一台 Mac。** 不在多台机器之间同步，也没有团队共享记忆。
 - **中文和日文的召回靠词语匹配。** 用中文或日文保存的笔记，只有在提问用到部分相同的词时才会自动加入提示；换一种说法提问常常找不到，但应用仍可主动搜索。如果设置了模型，中文或日文的问题也会用英文再搜一次，每次一个小的模型调用。直接输入保存要用 "remember that ..."，中文可以写 "记住：..."。其他语言目前找到的可靠性要低得多。
-- **从 Claude Code 保存效果最好。** 在 Codex 里要说 "remember that ..."；在 Cursor 里得由模型调用 `remember`。只有运行 `dawnmere setup --codex-sessions` 之后，才会读取 Codex 自己的会话文件。
+- **从 Claude Code 保存效果最好。** 在 Codex 里要说 "remember that ..."；在 Cursor 里得由模型调用 `remember`。只有运行 `dawnmere setup --codex-sessions` 之后，才会读取 Codex 自己的会话文件；另外，你在某次 Codex 对话里输入交接用语时，会读取那一次对话。
 - **筛查是自动的，也会有漏网之鱼。** 用 `dawnmere export` 检查一下应用都存了什么。
 - **早期测试版。** 版本靠手动发布，更新也很频繁；更新前请先看 [release notes](https://github.com/LF-Labs-Inc/dawnmere/releases)。
 
@@ -313,6 +313,6 @@ Dawnmere 由 LF Labs（GitHub 上的 [LF-Labs-Inc](https://github.com/LF-Labs-In
 
 ## 相关项目
 
-[memory-bench](https://github.com/LF-Labs-Inc/memory-bench) 是一个面向助手记忆的开放基准测试，出自同一批人之手。它有一行 Dawnmere 的数据，测的是已发布的引擎，泄露情况和召回结果并排列出；里面维护者的另一行是一个相关的系统，基准测试里也写明了这一点。
+[memory-bench](https://github.com/LF-Labs-Inc/memory-bench) 是一个面向助手记忆的开放基准测试，出自同一批人之手。它按答对的用例比例给已发布的 Dawnmere 评分，旁边列出每一类泄露率；里面维护者的另一行是一个相关的系统，基准测试里也写明了这一点。
 
 发现 bug？请[提交 issue](https://github.com/LF-Labs-Inc/dawnmere/issues/new/choose)，并附上 `dawnmere doctor --report` 的输出。安全问题请按 [SECURITY.md](SECURITY.md) 私下报告。

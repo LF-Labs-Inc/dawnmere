@@ -66,7 +66,7 @@ flowchart LR
 ## Dawnmere を選ぶ理由
 
 - **アプリごとではなく、メモリはひとつ。** すべてのアプリがひとつのストアを共有するので、Claude Code で保存した事実が、そのまま Cursor が呼び出す事実になります。
-- **保存先はあなたの Mac だけです。** メモリは Library フォルダにあるひとつの SQLite ファイルです。検索は小さなローカルモデルを使って Mac 上で行います。アカウントはなく、保存した内容が LF Labs に送られることはありません。送られるのは 1 日 1 回の匿名の利用カウントだけで、内容の確認もオフにすることもできます（[TELEMETRY.md](TELEMETRY.md)）。
+- **保存先はあなたの Mac だけです。** メモリは Library フォルダにあるひとつの SQLite ファイルです。検索は小さなローカルモデルを使って Mac 上で行います。アカウントはなく、あなたのメモリ、プロンプト、ファイルが LF Labs に送られることはありません。送られるのは 1 日 1 回の匿名の利用カウントだけで、内容の確認もオフにすることもできます（[TELEMETRY.md](TELEMETRY.md)）。
 - **読み取りには、あなた自身のモデルを使います。** 自動保存には、Claude Code 経由のあなたの Claude プランか、あなた自身の Anthropic API キーを使います。モデルなしで動かすこともできます。
 - **各アプリが見られるのは、あなたが許可した範囲だけ。** Cursor は最初は仕事用のメモしか見られません。新しく接続したアプリも同じです。Claude Code と Claude Desktop のメモリツール、そして名前を名乗るだけのアプリも、今のところ仕事用のメモしか見られません。Claude Code がプロンプトに自動で挿入する呼び出しは、引き続きすべてを見られます。アプリが見られる範囲を広げるには、あなた自身がターミナルで操作する必要があります。`dawnmere access cursor everything` を実行し、アプリの名前をもう一度入力して、macOS のダイアログで「Allow」をクリックします。チャットで頼んでも、このコマンドが返ってくるだけです。
   <!-- checked against v0.1.6 (406ee39/c3ed5b1): MCP tools of Claude Code, Claude Desktop and self-named apps see
@@ -229,7 +229,7 @@ sh install.sh
 | `dawnmere doctor` | Node.js も含めて、すべてが動くか確認する。1 項目 1 行で、問題ごとに対処法も表示 |
 | `dawnmere export` | メモリを `~/Downloads/dawnmere-export-<date>.json` に保存する（Markdown なら `--format md`） |
 | `dawnmere import FILE` | エクスポートファイルからメモリを追加する。すでにあるものはスキップ。macOS のダイアログで一度確認するまでは、アプリが保存したものとして扱われる |
-| `dawnmere access APP [LEVEL]` | アプリが見られる範囲を表示・変更する：`everything`、`work`、`nothing`（ここから広げられるのは Cursor と Codex だけ） |
+| `dawnmere access APP [LEVEL]` | アプリが見られる範囲を表示・変更する：`everything`、`work`、`nothing`（`nothing-personal` は `work` と同じ。ここから広げられるのは Cursor と Codex だけ） |
 | `dawnmere update` | 最新の release をインストールし、チェックサムで照合する |
 | `dawnmere uninstall` | セットアップが追加したものをすべて削除する |
 | `dawnmere held` | 確認するまでプロンプトに入らないアプリの保存と、それぞれを確認するための 1 行を表示する |
@@ -256,11 +256,11 @@ Claude Code も独自のメモリファイル（`~/.claude/projects/` 以下）�
 
 ## Mac の外に出るもの
 
-あなたのメモリが私たちのもとへアップロードされることはありません。Mac の外に出るものは次のとおりです。
+あなたのメモリが私たちのもとへアップロードされることはなく、あなたのメモリ、プロンプト、ファイルが LF Labs に送られることもありません。Mac の外に出るものは次のとおりです。
 
 - **利用カウント**（新しいインストールではオン。0.2.0 より前のインストールでは先に確認します）：多くても 1 日 1 回、毎月変わるランダムな ID、バージョン、接続している AI アプリ、いくつかの件数（範囲で表したもの）を LF Labs に送ります。メモリ、プロンプト、ファイルの中身は決して送りません。`dawnmere telemetry show` で内容を表示し、`dawnmere telemetry off` で止められます（[TELEMETRY.md](TELEMETRY.md)）。
-- **バックグラウンドでの読み取り**（モデルを選んだ場合）：あなたの Claude Code の会話を、あなた自身のプロバイダー（Claude Code 経由のあなたの Claude プラン、またはあなたのキーでの Anthropic API）に送ります。送るのは、あなたのメッセージ 6 件ごとと、セッションの操作がしばらく止まったときで、関連するメモリを最大 8 件添えます。その中には Codex や Cursor から保存されたものが含まれることもあります。ほかに、整理待ちのメモリ、Claude Code や Codex で入力した英語以外のプロンプト（英語で検索するため）、忘れさせたものの言葉（最大 24 時間）も送ります。週に一度（セットアップの少しあとにも一度）、ほぼ同じ内容のメモリ、古くなったと読めるメモリ、日付つきの状況メモを、それぞれ関連するメモリ数件と一緒に送り、統合・書き直し・無効化を行います。これらすべてを合わせて 1 日あたり最大 200 回です。モデルがなければ、これらは何も送られません。
-- **GitHub**：release とアップデート。GitHub の `gh` がインストール済みでログインしていれば、作業中のリポジトリのオープンな pull request も取得します。
+- **バックグラウンドでの読み取り**（モデルを選んだ場合）：あなたの Claude Code の会話を、あなた自身のプロバイダー（Claude Code 経由のあなたの Claude プラン、またはあなたのキーでの Anthropic API）に送ります。送るのは、あなたのメッセージ 6 件ごとと、セッションの操作がしばらく止まったときで、関連するメモリを最大 8 件添えます。その中には Codex や Cursor から保存されたものが含まれることもあります。`dawnmere setup --codex-sessions` を実行した場合は、Codex 自身のセッションファイル（`~/.codex/sessions`）も読み取り、その会話も同じように送ります。この設定がオフでも、Codex で "hand off" などの引き継ぎの言葉を入力すると、その Codex の会話は送られます。ほかに、整理待ちのメモリ、Claude Code や Codex で入力した英語以外のプロンプト（英語で検索するため）、忘れさせたものの言葉（最大 24 時間）も送ります。週に一度（セットアップの少しあとにも一度）、ほぼ同じ内容のメモリ、古くなったと読めるメモリ、日付つきの状況メモを、それぞれ関連するメモリ数件と一緒に送り、統合・書き直し・無効化を行います。これらすべてを合わせて 1 日あたり最大 200 回です。モデルがなければ、これらは何も送られません。
+- **GitHub**：release とアップデート。GitHub の `gh` がインストール済みでログインしていれば、作業中のリポジトリのオープンな pull request と、最近の pull request の状態も取得します。これは新しいチャットの最初に出る短い「Where you left off」（オープンな pull request とあなたの対応待ちのもの、実行中のジョブ、コミットしていない作業、前回のセッションのメモ）に使い、そのアプリのプロンプトに入ります。`gh` からログアウトすると、GitHub の部分は止まります。
 - **ダウンロード**：uv、Python、エンジンが使う Python パッケージ（GitHub と PyPI から）、検索モデルと Claude Code プラグイン（このリポジトリとその release から）、コネクタ（npm から一度ダウンロードし、アプリが起動するたびに npm に問い合わせます）。`dawnmere update` は GitHub に最新の release を問い合わせます。
 - **セットアップでのモデルの確認**：Claude Code か Anthropic API に、短いテスト呼び出しを 1 回送ります。
 - **インストールのコマンド**：dawnmere.app は、インストールスクリプトが取得されるたびに数えます（取得したツール、参照元のサイト、国。IP アドレスは保存しません）。そのあと GitHub に転送します。サイト自体の計測については[プライバシーのページ](https://dawnmere.app/privacy)をご覧ください。
@@ -301,7 +301,7 @@ Dawnmere は LF Labs（GitHub の [LF-Labs-Inc](https://github.com/LF-Labs-Inc) 
 - **Mac 専用**です。Apple シリコン、macOS 14 以降が必要です。エンジンの ONNX ランタイムには Intel Mac 版がなく、Linux 版や Windows 版もありません。
 - **Mac 1 台だけ。** マシン間の同期や、チームで共有するメモリはありません。
 - **中国語と日本語の想起は言葉の一致で行います。** 中国語や日本語で保存したメモは、同じ言葉を一部使って質問したときにプロンプトへ追加されます。言い換えた質問は見つからないことがよくありますが、アプリから検索はできます。モデルを設定している場合、中国語や日本語の質問は英語でも検索されます（1回につき小さなモデル呼び出し1回）。入力して保存するには "remember that ..." と書きます。日本語なら "覚えておいて：..." でも保存できます。そのほかの言語は、今のところ見つかる確実性がかなり低くなります。
-- **保存がいちばん確実なのは Claude Code です。** Codex では "remember that ..." と言ってください。Cursor ではモデルが `remember` を呼ぶ必要があります。Codex 自身のセッションファイルは、`dawnmere setup --codex-sessions` を実行した場合だけ読み取ります。
+- **保存がいちばん確実なのは Claude Code です。** Codex では "remember that ..." と言ってください。Cursor ではモデルが `remember` を呼ぶ必要があります。Codex 自身のセッションファイルは、`dawnmere setup --codex-sessions` を実行した場合と、引き継ぎの言葉を入力したその会話だけ読み取ります。
 - **チェックは自動なので、見逃すこともあります。** アプリが何を保存したかは `dawnmere export` で確認してください。
 - **初期ベータです。** リリースは手作業で、頻繁に出ます。アップデートの前に [リリースノート](https://github.com/LF-Labs-Inc/dawnmere/releases) を読んでください。
 
@@ -313,6 +313,6 @@ Dawnmere は LF Labs（GitHub の [LF-Labs-Inc](https://github.com/LF-Labs-Inc) 
 
 ## 関連プロジェクト
 
-[memory-bench](https://github.com/LF-Labs-Inc/memory-bench) は、アシスタントのメモリを評価するオープンなベンチマークで、同じチームが作っています。公開されているエンジンで測った Dawnmere の行があり、漏れの数と呼び出しの結果が並べて示されています。そこにあるメンテナーのもう一つの行は関連するシステムのもので、ベンチマークにもそう明記されています。
+[memory-bench](https://github.com/LF-Labs-Inc/memory-bench) は、アシスタントのメモリを評価するオープンなベンチマークで、同じチームが作っています。公開されている Dawnmere を、正しく答えられたケースの割合で評価し、その横にすべての漏れの率を示しています。そこにあるメンテナーのもう一つの行は関連するシステムのもので、ベンチマークにもそう明記されています。
 
 バグを見つけたら、`dawnmere doctor --report` の出力を添えて [issue を作成](https://github.com/LF-Labs-Inc/dawnmere/issues/new/choose)してください。セキュリティの問題は [SECURITY.md](SECURITY.md) の手順で報告してください。
