@@ -11,7 +11,8 @@
 </h1>
 
 <p align="center"><b>告诉一个 AI，它们就都知道了。</b><br>
-你 Mac 上的一份记忆，由 Claude Code、Codex 和 Cursor 共享。</p>
+你 Mac 上的一份记忆，由 Claude Code、Codex 和 Cursor 共享。<br>
+<a href="https://dawnmere.app">dawnmere.app</a></p>
 
 <p align="center">
   <img src="assets/kip-loop.gif" width="800"

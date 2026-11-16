@@ -8,7 +8,8 @@
 </h1>
 
 <p align="center"><b>Tell one AI. They all know.</b><br>
-One memory on your Mac, shared by Claude Code, Codex and Cursor.</p>
+One memory on your Mac, shared by Claude Code, Codex and Cursor.<br>
+<a href="https://dawnmere.app">dawnmere.app</a></p>
 
 <p align="center">
   <img src="assets/kip-loop.gif" width="800"

@@ -11,7 +11,8 @@
 </h1>
 
 <p align="center"><b>ひとつの AI に伝えれば、どの AI も知っている。</b><br>
-Mac の中のひとつのメモリを、Claude Code・Codex・Cursor で共有します。</p>
+Mac の中のひとつのメモリを、Claude Code・Codex・Cursor で共有します。<br>
+<a href="https://dawnmere.app">dawnmere.app</a></p>
 
 <p align="center">
   <img src="assets/kip-loop.gif" width="800"
