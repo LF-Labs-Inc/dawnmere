@@ -21,7 +21,7 @@ curl -fsSL https://dawnmere.app/install | sh
 
 **Needs:** a Mac with Apple silicon, macOS 14 or later, 1 GB of free disk space, and Node.js 18 or later. Free, no
 account.<br>
-**Status:** early beta (0.1.x). MIT client, source-available engine (FSL, becomes MIT after two years).
+**Status:** early beta (0.2). MIT client, source-available engine (FSL, becomes MIT after two years).
 Made by [LF Labs](#who-makes-it-and-the-lf-labs-names).
 
 <!-- Apple silicon and macOS 14: install.sh:35-38 refuses anything else, and setup.py:73-74 checks macOS again.
