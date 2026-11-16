@@ -29,6 +29,7 @@ def box(mac, monkeypatch, tmp_path):
     short = Path(tempfile.mkdtemp(prefix="lfs", dir="/tmp"))
     data = short / "data"
     monkeypatch.setenv("LFLABS_MEMORY_HOME", str(data))
+    monkeypatch.setenv("LFLABS_MEMORY_TELEMETRY", "0")  # usage counts have their own tests (test_telemetry.py)
     state = short / "engine-state.json"
     monkeypatch.setenv("FAKE_ENGINE_STATE", str(state))
     engine = mac.bin / "lflabs-memory"
@@ -95,8 +96,8 @@ Dawnmere gives Claude Code, Codex and Cursor one shared memory on this Mac.
 
 Your memory is one file here, never uploaded to us. After a Claude Code
 session goes quiet, your own model (your Claude plan or API key) reads the
-conversation and keeps what is worth remembering. Nothing goes to LF Labs. No
-usage data, ever.
+conversation and keeps what is worth remembering. No memory, prompt or file
+of yours goes to LF Labs; setup asks about anonymous usage counts.
 
 Setup adds Dawnmere to Claude Code, Codex and Cursor, backing up every file it
 touches, and starts a small background service that keeps search fast.

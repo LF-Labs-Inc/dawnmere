@@ -23,7 +23,7 @@ import urllib.request
 from importlib import metadata
 from pathlib import Path
 
-from . import apps, claude_settings, edits, install_record, launchd, layout, models, prompt
+from . import apps, claude_settings, edits, install_record, launchd, layout, models, prompt, telemetry
 from .brand import COMMAND, PRODUCT, REPO
 from .layout import (CLI_DIST, CONNECTOR, CONNECTOR_VERSION, ENGINE_DIST, LABEL, MARKETPLACE, OLD_MARKETPLACE,
                      OLD_SERVER, SERVER, data_dir, developer_tools, engine_bin, engine_record, home, short, uv_bin)
@@ -404,4 +404,8 @@ def finish(old_version, say=print, get=fetch):
     rename_entries(say)
     bump_pins(say)
     say(f"{PRODUCT} is updated ({old_version} to {installed_version()}).")
+    # An install from before usage counts existed sends none until it answers: asked here once, at a terminal only
+    telemetry.honor_env()
+    if telemetry.ask_once(prompt.yes_no) is not None:
+        say(telemetry.status_text().splitlines()[0])
     return 0

@@ -4,7 +4,7 @@ import shutil
 import time
 from pathlib import Path
 
-from . import apps, claude_settings, edits, install_record, keychain, launchd, layout, prompt, sockets
+from . import apps, claude_settings, edits, install_record, keychain, launchd, layout, prompt, sockets, telemetry
 from .brand import COMMAND
 from .layout import (BACKUP_TAG, CLI_DIST, MARKETPLACE, OLD_MARKETPLACE, OLD_SERVER, SERVER, connector_sock, data_dir,
                      engine_sock, home, logs_dir, short, uv_bin)
@@ -156,6 +156,9 @@ def main(keep_data=False, out=print):
 
     ok, note = launchd.remove()
     rep.row("Background service", "removed" if ok else "gone", note)
+    if telemetry.plist_path().exists():
+        telemetry.remove_agent()
+        rep.row("Daily usage ping", "removed", "stopped and removed")
     _stale_sockets(rep)
 
     _claude_plugin(record, rep)

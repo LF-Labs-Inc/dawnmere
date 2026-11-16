@@ -1,0 +1,17 @@
+# The usage-count endpoint (TELEMETRY.md). Deploy: wrangler d1 create dawnmere-telemetry, put its id below,
+# wrangler d1 execute dawnmere-telemetry --remote --file schema.sql, then wrangler deploy.
+name = "dawnmere-telemetry"
+main = "worker.js"
+compatibility_date = "2026-11-01"
+routes = [{ pattern = "telemetry.dawnmere.app", custom_domain = true }]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "dawnmere-telemetry"
+database_id = "852a709c-3667-4f3d-81ae-9c730b7d94db"
+
+[triggers]
+crons = ["17 3 * * *"]   # daily: yesterday's totals, then single pings older than 7 days go
+
+[observability]
+enabled = false          # no request logs (they would hold IP addresses)

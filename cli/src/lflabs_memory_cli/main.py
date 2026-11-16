@@ -72,6 +72,11 @@ def cmd_access(args):
     return access.main(args.app, args.level, engine_bin() or ENGINE)
 
 
+def cmd_telemetry(args):
+    from . import telemetry
+    return telemetry.main(args.action)
+
+
 def cmd_update(args):
     from . import update
     if args.finish:
@@ -87,6 +92,7 @@ COMMANDS = {
     "import": (cmd_import, "add memories from an export file"),
     "access": (cmd_access, "what each AI app may see (access), or change one: access cursor everything|work"),
     "update": (cmd_update, f"update {PRODUCT}"),
+    "telemetry": (cmd_telemetry, "anonymous usage counts: status, show what is sent, on or off"),
 }
 
 
@@ -176,6 +182,9 @@ def parser():
             sp.add_argument("--check", action="store_true", help="only say whether there is a newer version")
             sp.add_argument("--yes", action="store_true")
             sp.add_argument("--finish", metavar="FROM", help=argparse.SUPPRESS)
+        elif name == "telemetry":
+            sp.add_argument("action", nargs="?", choices=("status", "show", "on", "off", "ping"), metavar="action",
+                            help="status (the default), show (exactly what is sent), on or off")
     return p
 
 

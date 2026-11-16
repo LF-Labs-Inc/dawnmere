@@ -24,7 +24,7 @@ curl -fsSL https://dawnmere.app/install | sh
 
 **必要なもの：** Apple シリコン搭載の Mac、macOS 14 以降、1 GB の空きディスク容量、Node.js 18 以降。無料で、アカウントは不要です。<br>
 **ご注意：** 日本語のメモは、同じ言葉を使って質問すると見つかります。言い換えた質問はまだ見つからないことが多いです（[#27](https://github.com/LF-Labs-Inc/dawnmere/issues/27)）。<br>
-**ステータス：** 初期ベータ（0.1.x）。クライアントは MIT、エンジンはソース公開（source-available、FSL。2 年後に MIT へ移行）。開発は [LF Labs](#who-makes-it-and-the-lf-labs-names) です。
+**ステータス：** 初期ベータ（0.2）。クライアントは MIT、エンジンはソース公開（source-available、FSL。2 年後に MIT へ移行）。開発は [LF Labs](#who-makes-it-and-the-lf-labs-names) です。
 
 <!-- Apple silicon and macOS 14: install.sh:35-38 refuses anything else, and setup.py:73-74 checks macOS again.
      Node 18: connector/package.json "engines" >=18; every app's MCP entry runs `npx -y dawnmere-connector@...`
@@ -66,7 +66,7 @@ flowchart LR
 ## Dawnmere を選ぶ理由
 
 - **アプリごとではなく、メモリはひとつ。** すべてのアプリがひとつのストアを共有するので、Claude Code で保存した事実が、そのまま Cursor が呼び出す事実になります。
-- **保存先はあなたの Mac だけです。** メモリは Library フォルダにあるひとつの SQLite ファイルです。検索は小さなローカルモデルを使って Mac 上で行います。アカウントはなく、LF Labs には何も送られず、ツールが利用データを集めることもありません。
+- **保存先はあなたの Mac だけです。** メモリは Library フォルダにあるひとつの SQLite ファイルです。検索は小さなローカルモデルを使って Mac 上で行います。アカウントはなく、あなたのメモリ、プロンプト、ファイルが LF Labs に送られることはありません。送られるのは 1 日 1 回の匿名の利用カウントだけで、内容の確認もオフにすることもできます（[TELEMETRY.md](TELEMETRY.md)）。
 - **読み取りには、あなた自身のモデルを使います。** 自動保存には、Claude Code 経由のあなたの Claude プランか、あなた自身の Anthropic API キーを使います。モデルなしで動かすこともできます。
 - **各アプリが見られるのは、あなたが許可した範囲だけ。** Cursor は最初は仕事用のメモしか見られません。新しく接続したアプリも同じです。Claude Code と Claude Desktop のメモリツール、そして名前を名乗るだけのアプリも、今のところ仕事用のメモしか見られません。Claude Code がプロンプトに自動で挿入する呼び出しは、引き続きすべてを見られます。アプリが見られる範囲を広げるには、あなた自身がターミナルで操作する必要があります。`dawnmere access cursor everything` を実行し、アプリの名前をもう一度入力して、macOS のダイアログで「Allow」をクリックします。チャットで頼んでも、このコマンドが返ってくるだけです。
   <!-- checked against v0.1.6 (406ee39/c3ed5b1): MCP tools of Claude Code, Claude Desktop and self-named apps see
@@ -80,8 +80,8 @@ flowchart LR
 - **セットアップは元に戻せます。** 何かを変える前に必ず確認し、触れるファイルはすべてバックアップします。`--dry-run` で計画だけを表示でき、`dawnmere uninstall` でファイルを元に戻せます。
 
 <!-- Local store and models: engine METADATA "SQLite + vectors + keyword search", models.json (bge-small, MiniLM
-     reranker, optional sense model). No usage data: no telemetry code in the CLI; the engine turns off onnxruntime's
-     telemetry (mem.py:206-208). Access defaults: settings.py:9 new_clients "work"; setup.py:100,135-137 Cursor
+     reranker, optional sense model). Usage counts: cli telemetry.py only (on for a new install, asked once for an
+     older one; TELEMETRY.md); the engine sends none and turns off onnxruntime's telemetry (mem.py:206-208). Access defaults: settings.py:9 new_clients "work"; setup.py:100,135-137 Cursor
      personal notes off unless you say yes. Backups and record: setup.py:6, edits.py, uninstall.py:44-72. -->
 
 ## ほかのツールとの比較
@@ -256,8 +256,9 @@ Claude Code も独自のメモリファイル（`~/.claude/projects/` 以下）�
 
 ## Mac の外に出るもの
 
-あなたのメモリが私たちのもとへアップロードされることはなく、LF Labs には何も送られません。Mac の外に出るものは次のとおりです。
+あなたのメモリが私たちのもとへアップロードされることはなく、あなたのメモリ、プロンプト、ファイルが LF Labs に送られることもありません。Mac の外に出るものは次のとおりです。
 
+- **利用カウント**（新しいインストールではオン。0.2.0 より前のインストールでは先に確認します）：多くても 1 日 1 回、毎月変わるランダムな ID、バージョン、接続している AI アプリ、いくつかの件数（範囲で表したもの）を LF Labs に送ります。メモリ、プロンプト、ファイルの中身は決して送りません。`dawnmere telemetry show` で内容を表示し、`dawnmere telemetry off` で止められます（[TELEMETRY.md](TELEMETRY.md)）。
 - **バックグラウンドでの読み取り**（モデルを選んだ場合）：あなたの Claude Code の会話を、あなた自身のプロバイダー（Claude Code 経由のあなたの Claude プラン、またはあなたのキーでの Anthropic API）に送ります。送るのは、あなたのメッセージ 6 件ごとと、セッションの操作がしばらく止まったときで、関連するメモリを最大 8 件添えます。その中には Codex や Cursor から保存されたものが含まれることもあります。`dawnmere setup --codex-sessions` を実行した場合は、Codex 自身のセッションファイル（`~/.codex/sessions`）も読み取り、その会話も同じように送ります。この設定がオフでも、Codex で "hand off" などの引き継ぎの言葉を入力すると、その Codex の会話は送られます。ほかに、整理待ちのメモリ、Claude Code や Codex で入力した英語以外のプロンプト（英語で検索するため）、忘れさせたものの言葉（最大 24 時間）も送ります。週に一度（セットアップの少しあとにも一度）、ほぼ同じ内容のメモリ、古くなったと読めるメモリ、日付つきの状況メモを、それぞれ関連するメモリ数件と一緒に送り、統合・書き直し・無効化を行います。これらすべてを合わせて 1 日あたり最大 200 回です。モデルがなければ、これらは何も送られません。
 - **GitHub**：release とアップデート。GitHub の `gh` がインストール済みでログインしていれば、作業中のリポジトリのオープンな pull request と、最近の pull request の状態も取得します。これは新しいチャットの最初に出る短い「Where you left off」（オープンな pull request とあなたの対応待ちのもの、実行中のジョブ、コミットしていない作業、前回のセッションのメモ）に使い、そのアプリのプロンプトに入ります。`gh` からログアウトすると、GitHub の部分は止まります。
 - **ダウンロード**：uv、Python、エンジンが使う Python パッケージ（GitHub と PyPI から）、検索モデルと Claude Code プラグイン（このリポジトリとその release から）、コネクタ（npm から一度ダウンロードし、アプリが起動するたびに npm に問い合わせます）。`dawnmere update` は GitHub に最新の release を問い合わせます。
