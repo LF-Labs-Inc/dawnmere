@@ -229,7 +229,7 @@ sh install.sh
 | `dawnmere doctor` | 检查一切是否正常（包括 Node.js），每项检查一行，并给出每个问题的处理办法 |
 | `dawnmere export` | 把记忆导出到 `~/Downloads/dawnmere-export-<date>.json`（加 `--format md` 导出为 Markdown） |
 | `dawnmere import FILE` | 从导出文件中添加记忆，已有的会跳过；在你通过一个 macOS 对话框确认之前，它们都算作应用保存的内容 |
-| `dawnmere access APP [LEVEL]` | 查看或修改某个应用能看到的范围：`everything`、`work` 或 `nothing`（在这里只能放宽 Cursor 和 Codex） |
+| `dawnmere access APP [LEVEL]` | 查看或修改某个应用能看到的范围：`everything`、`work` 或 `nothing`（`nothing-personal` 与 `work` 相同；在这里只能放宽 Cursor 和 Codex） |
 | `dawnmere update` | 安装最新 release，并用它的校验值校验 |
 | `dawnmere uninstall` | 移除 setup 添加的一切 |
 | `dawnmere held` | 列出在你确认之前不会进入提示词的应用保存，以及确认每一条要用的那行命令 |
@@ -258,8 +258,8 @@ Claude Code 自己也会保存记忆文件（在 `~/.claude/projects/` 下）。
 
 你的记忆绝不会上传给我们，也不会向 LF Labs 发送任何东西。会离开你 Mac 的有：
 
-- **后台阅读**（如果你选了模型）：会把你的 Claude Code 对话发给你自己的模型提供方（通过 Claude Code 使用你的 Claude 订阅，或用你的密钥调用 Anthropic API），时机是你每发 6 条消息之后以及会话空闲时，并附上最多 8 条相关记忆，其中可能包括从 Codex 或 Cursor 存下的记忆。它还会发送等待归档的记忆、在 Claude Code 或 Codex 里输入的非英文提示词（以便用英文搜索），以及你遗忘的内容的文字（最多 24 小时）。每周一次（setup 之后不久也会有一次），它还会发送内容几乎相同的记忆、读起来已经过时的记忆和带日期的状态记录，每条附上几条相关记忆，用来合并、改写或停用它们。以上合计每天最多 200 次调用；不用模型时，这些都不会发送。
-- **GitHub**：获取 release 和更新；如果装了 GitHub 的 `gh` 并已登录，还会获取你当前所在仓库的未关闭 pull request。
+- **后台阅读**（如果你选了模型）：会把你的 Claude Code 对话发给你自己的模型提供方（通过 Claude Code 使用你的 Claude 订阅，或用你的密钥调用 Anthropic API），时机是你每发 6 条消息之后以及会话空闲时，并附上最多 8 条相关记忆，其中可能包括从 Codex 或 Cursor 存下的记忆。如果运行了 `dawnmere setup --codex-sessions`，它还会读取 Codex 自己的会话文件（`~/.codex/sessions`），并以同样的方式发送这些对话；这个设置关闭时，在 Codex 里输入 "hand off" 之类的交接用语，仍会发送那次 Codex 对话。它还会发送等待归档的记忆、在 Claude Code 或 Codex 里输入的非英文提示词（以便用英文搜索），以及你遗忘的内容的文字（最多 24 小时）。每周一次（setup 之后不久也会有一次），它还会发送内容几乎相同的记忆、读起来已经过时的记忆和带日期的状态记录，每条附上几条相关记忆，用来合并、改写或停用它们。以上合计每天最多 200 次调用；不用模型时，这些都不会发送。
+- **GitHub**：获取 release 和更新；如果装了 GitHub 的 `gh` 并已登录，还会获取你当前所在仓库的未关闭 pull request，以及它最近的 pull request 的状态。它们用于新对话开头那段简短的 “Where you left off”（未关闭的 pull request 和等你处理的事、正在运行的任务、未提交的改动、上次会话的记录），这段内容会放进该应用的提示词。退出 `gh` 的登录，GitHub 这部分就会停止。
 - **下载**：uv、Python 和引擎依赖的 Python 包（来自 GitHub 和 PyPI）；搜索模型和 Claude Code 插件（来自本仓库及其 release）；连接器（从 npm 下载一次，之后应用每次启动它时会向 npm 查询）。`dawnmere update` 会向 GitHub 查询最新 release。
 - **setup 检查模型**：向 Claude Code 或 Anthropic API 发一次简短的测试调用。
 - **安装命令**：dawnmere.app 会统计安装脚本每一次被获取（获取它的工具、来源网站和国家；不保留 IP 地址），然后转到 GitHub。网站自身的统计见它的[隐私页面](https://dawnmere.app/privacy)。

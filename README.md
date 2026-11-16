@@ -284,7 +284,7 @@ removes either name.
 | `dawnmere doctor` | check that everything works, Node.js included, one line per check, with what to do about each problem |
 | `dawnmere export` | save your memory to `~/Downloads/dawnmere-export-<date>.json` (`--format md` for Markdown) |
 | `dawnmere import FILE` | add the memories from an export file, skipping any already there; they count as app saves until you confirm them in one macOS dialog |
-| `dawnmere access APP [LEVEL]` | show what an app may see, or change it: `everything`, `work` or `nothing` (only Cursor and Codex can be widened from here) |
+| `dawnmere access APP [LEVEL]` | show what an app may see, or change it: `everything`, `work` or `nothing` (`nothing-personal` works like `work`; only Cursor and Codex can be widened from here) |
 | `dawnmere update` | install the newest release, checked against its checksums |
 | `dawnmere uninstall` | remove everything setup added |
 | `dawnmere held` | app saves kept out of your prompts until you confirm them, with the line that confirms each |
@@ -326,13 +326,18 @@ Your memory is never uploaded to us, and nothing is sent to LF Labs. What leaves
 
 - **Background reading**, if you chose a model, sends your own provider (your Claude plan through Claude Code, or the
   Anthropic API with your key) your Claude Code conversations, after every 6 of your messages and when a session goes
-  quiet, with up to 8 related memories, which can include ones saved from Codex or Cursor. It also sends memories
+  quiet, with up to 8 related memories, which can include ones saved from Codex or Cursor. With
+  `dawnmere setup --codex-sessions`, it also reads Codex's own session files (`~/.codex/sessions`) and sends those
+  conversations the same way; with that setting off, typing a handoff phrase such as "hand off" in Codex still sends
+  that Codex conversation. It also sends memories
   waiting to be filed, a prompt not in English typed in Claude Code or Codex (to search it in English), and for up to 24 hours the
   words of something you forgot. Once a week, and once soon after setup, it also sends memories that say nearly the
   same thing, memories that read as out of date and dated status notes, each with a few related memories, to merge,
   rewrite or retire them. At most 200 calls a day in all; with no model, none of this is sent.
 - **GitHub**: releases and updates, and, if GitHub's `gh` is installed and logged in, the open pull requests of the
-  repo you are working in.
+  repo you are working in and the state of its recent ones. They are for the short "Where you left off" block at the
+  start of a new chat (open pull requests and what waits on you, running jobs, uncommitted work and the last session's
+  notes), which goes into that app's prompt. Logging out of `gh` stops the GitHub part.
 - **Downloads**: uv, Python and the engine's Python packages (from GitHub and PyPI); the search models and the Claude
   Code plugin (from this repo's releases and repo); the connector (from npm: downloaded once, and npm is checked when an app starts it). `dawnmere update`
   asks GitHub for the newest release.
