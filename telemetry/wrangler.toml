@@ -8,7 +8,7 @@ routes = [{ pattern = "telemetry.dawnmere.app", custom_domain = true }]
 [[d1_databases]]
 binding = "DB"
 database_name = "dawnmere-telemetry"
-database_id = "REPLACE-WITH-THE-D1-ID"
+database_id = "852a709c-3667-4f3d-81ae-9c730b7d94db"
 
 [triggers]
 crons = ["17 3 * * *"]   # daily: yesterday's totals, then single pings older than 7 days go
