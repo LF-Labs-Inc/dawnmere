@@ -300,7 +300,7 @@ Dawnmere は LF Labs（GitHub の [LF-Labs-Inc](https://github.com/LF-Labs-Inc) 
 - **Mac 専用**です。Apple シリコン、macOS 14 以降が必要です。エンジンの ONNX ランタイムには Intel Mac 版がなく、Linux 版や Windows 版もありません。
 - **Mac 1 台だけ。** マシン間の同期や、チームで共有するメモリはありません。
 - **中国語と日本語の想起は言葉の一致で行います。** 中国語や日本語で保存したメモは、同じ言葉を一部使って質問したときにプロンプトへ追加されます。言い換えた質問は見つからないことがよくありますが、アプリから検索はできます。モデルを設定している場合、中国語や日本語の質問は英語でも検索されます（1回につき小さなモデル呼び出し1回）。入力して保存するには "remember that ..." と書きます。日本語なら "覚えておいて：..." でも保存できます。そのほかの言語は、今のところ見つかる確実性がかなり低くなります。
-- **保存がいちばん確実なのは Claude Code です。** Codex では "remember that ..." と言ってください。Cursor ではモデルが `remember` を呼ぶ必要があります。Codex 自身のセッションファイルは、`dawnmere setup --codex-sessions` を実行した場合だけ読み取ります。
+- **保存がいちばん確実なのは Claude Code です。** Codex では "remember that ..." と言ってください。Cursor ではモデルが `remember` を呼ぶ必要があります。Codex 自身のセッションファイルは、`dawnmere setup --codex-sessions` を実行した場合と、引き継ぎの言葉を入力したその会話だけ読み取ります。
 - **チェックは自動なので、見逃すこともあります。** アプリが何を保存したかは `dawnmere export` で確認してください。
 - **初期ベータです。** リリースは手作業で、頻繁に出ます。アップデートの前に [リリースノート](https://github.com/LF-Labs-Inc/dawnmere/releases) を読んでください。
 

@@ -397,7 +397,8 @@ programs use the LF Labs name, so these are all Dawnmere:
   needs "remember that ..." (in Chinese "记住：...", in Japanese "覚えておいて：..."). Other languages are found much
   less reliably for now.
 - **Saving is strongest from Claude Code.** In Codex, say "remember that ..."; in Cursor, the model has to call
-  `remember`. Codex's own session files are read only if you run `dawnmere setup --codex-sessions`.
+  `remember`. Codex's own session files are read only if you run `dawnmere setup --codex-sessions`, or for one
+  conversation when you type a handoff phrase in it.
 - **Screening is automatic and can miss things.** Review what your apps save with `dawnmere export`.
 - **Early beta.** Releases are cut by hand and come often; read the
   [release notes](https://github.com/LF-Labs-Inc/dawnmere/releases) before updating.
