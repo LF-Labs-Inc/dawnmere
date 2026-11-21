@@ -12,7 +12,7 @@
 
 <p align="center"><b>告诉一个 AI，它们就都知道了。</b><br>
 你 Mac 上的一份记忆，由 Claude Code、Codex 和 Cursor 共享。<br>
-<a href="https://dawnmere.app">dawnmere.app</a></p>
+<a href="https://dawnmere.app/?src=gh-readme">dawnmere.app</a></p>
 
 <p align="center">
   <img src="assets/kip-loop.gif" width="800"
@@ -20,7 +20,7 @@
 </p>
 
 ```bash
-curl -fsSL https://dawnmere.app/install | sh
+curl -fsSL 'https://dawnmere.app/install?src=gh-readme' | sh
 ```
 
 **环境要求：** 搭载 Apple 芯片的 Mac，macOS 14 或更高版本，1 GB 可用磁盘空间，Node.js 18 或更高版本。免费，无需注册账号。<br>
@@ -112,7 +112,7 @@ flowchart LR
 ## 安装
 
 ```bash
-curl -fsSL https://dawnmere.app/install | sh
+curl -fsSL 'https://dawnmere.app/install?src=gh-readme' | sh
 ```
 
 更喜欢 Homebrew？
