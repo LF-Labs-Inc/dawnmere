@@ -77,6 +77,19 @@ def cmd_telemetry(args):
     return telemetry.main(args.action)
 
 
+def cmd_models(args):
+    from . import models
+    if args.get:
+        return models.get(args.get, say=(lambda s: None) if args.quiet else print)
+    man = models.manifest()
+    if man is None:
+        print("The engine has no models list: reinstall with the install line.")
+        return 1
+    for name, state in models.check(man).items():
+        print(f"{name:<11}{state}{'  (Chinese and Japanese: downloaded on first use)' if name in models.LAZY else ''}")
+    return 0
+
+
 def cmd_update(args):
     from . import update
     if args.finish:
@@ -93,6 +106,7 @@ COMMANDS = {
     "access": (cmd_access, "what each AI app may see (access), or change one: access cursor everything|work"),
     "update": (cmd_update, f"update {PRODUCT}"),
     "telemetry": (cmd_telemetry, "anonymous usage counts: status, show what is sent, on or off"),
+    "models": (cmd_models, "the local search models: list them, or --get the Chinese and Japanese ones now"),
 }
 
 
@@ -178,6 +192,9 @@ def parser():
         elif name == "access":
             sp.add_argument("app", nargs="?", help="cursor, codex, ... (none: every app on this Mac)")
             sp.add_argument("level", nargs="?", help="everything, work or nothing (none: show it)")
+        elif name == "models":
+            sp.add_argument("--get", nargs="+", metavar="NAME", help="download these models now (embed-ml rerank-ml)")
+            sp.add_argument("--quiet", action="store_true", help=argparse.SUPPRESS)
         elif name == "update":
             sp.add_argument("--check", action="store_true", help="only say whether there is a newer version")
             sp.add_argument("--yes", action="store_true")
