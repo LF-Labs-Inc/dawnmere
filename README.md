@@ -9,7 +9,7 @@
 
 <p align="center"><b>Tell one AI. They all know.</b><br>
 One memory on your Mac, shared by Claude Code, Codex and Cursor.<br>
-<a href="https://dawnmere.app">dawnmere.app</a></p>
+<a href="https://dawnmere.app/?src=gh-readme">dawnmere.app</a></p>
 
 <p align="center">
   <img src="assets/kip-loop.gif" width="800"
@@ -17,7 +17,7 @@ One memory on your Mac, shared by Claude Code, Codex and Cursor.<br>
 </p>
 
 ```bash
-curl -fsSL https://dawnmere.app/install | sh
+curl -fsSL 'https://dawnmere.app/install?src=gh-readme' | sh
 ```
 
 **Needs:** a Mac with Apple silicon, macOS 14 or later, 1 GB of free disk space, and Node.js 18 or later. Free, no
@@ -133,7 +133,7 @@ the memories that match the prompt, not the whole file every time.
 ## Install
 
 ```bash
-curl -fsSL https://dawnmere.app/install | sh
+curl -fsSL 'https://dawnmere.app/install?src=gh-readme' | sh
 ```
 
 Prefer Homebrew?

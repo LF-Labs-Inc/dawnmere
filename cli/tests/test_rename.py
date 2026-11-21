@@ -300,7 +300,9 @@ def test_front_door_reaches_the_real_engine():
 # ---------- the plugin's setup command, and the README ----------
 
 def install_line():
-    m = re.search(r"curl -fsSL (\S+) \| sh", (ROOT / "README.md").read_text())
+    """The address the README's install line fetches, without its quotes and its ?src= tag (which counts installs
+    copied from GitHub; the plugin's own line is counted on its own)."""
+    m = re.search(r"curl -fsSL '?(https://[^\s'?]+)(?:\?src=[a-z0-9-]+)?'? \| sh", (ROOT / "README.md").read_text())
     return m.group(1)
 
 

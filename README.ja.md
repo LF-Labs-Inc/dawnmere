@@ -12,7 +12,7 @@
 
 <p align="center"><b>ひとつの AI に伝えれば、どの AI も知っている。</b><br>
 Mac の中のひとつのメモリを、Claude Code・Codex・Cursor で共有します。<br>
-<a href="https://dawnmere.app">dawnmere.app</a></p>
+<a href="https://dawnmere.app/?src=gh-readme">dawnmere.app</a></p>
 
 <p align="center">
   <img src="assets/kip-loop.gif" width="800"
@@ -20,7 +20,7 @@ Mac の中のひとつのメモリを、Claude Code・Codex・Cursor で共有�
 </p>
 
 ```bash
-curl -fsSL https://dawnmere.app/install | sh
+curl -fsSL 'https://dawnmere.app/install?src=gh-readme' | sh
 ```
 
 **必要なもの：** Apple シリコン搭載の Mac、macOS 14 以降、1 GB の空きディスク容量、Node.js 18 以降。無料で、アカウントは不要です。<br>
@@ -112,7 +112,7 @@ flowchart LR
 ## インストール
 
 ```bash
-curl -fsSL https://dawnmere.app/install | sh
+curl -fsSL 'https://dawnmere.app/install?src=gh-readme' | sh
 ```
 
 Homebrew を使いたい場合：
