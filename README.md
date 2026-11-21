@@ -217,7 +217,7 @@ Then it shows each step as it runs:
 | Step | What happens |
 | --- | --- |
 | Claude Code | checks that `claude` is there and logged in |
-| Search models | downloads the search models (about 310 MB) and checks each file's size and sha256 |
+| Search models | downloads the search models (about 310 MB) and checks each file's size and sha256. The two for Chinese and Japanese (about 271 MB) are not part of setup: they download the first time you save or ask something in either language |
 | Memory service | starts a background service (a LaunchAgent) that keeps search fast |
 | Your apps | connects Claude Code, Codex, Cursor and the other apps listed below, if they are installed |
 | Your notes | imports your Claude Code notes |
@@ -397,11 +397,16 @@ programs use the LF Labs name, so these are all Dawnmere:
 - **Mac only**, Apple silicon, macOS 14 or later. The engine's ONNX runtime has no Intel Mac build, and there is no
   Linux or Windows version.
 - **One Mac.** There is no sync between machines and no team memory.
-- **Chinese and Japanese recall matches words.** A note saved in Chinese or Japanese reaches your prompts when you ask
-  with some of the same words. A question worded differently is often missed; your app can still search for it. With
-  a model set up, a Chinese or Japanese question is also searched in English, one small model call each. A typed save
-  needs "remember that ..." (in Chinese "记住：...", in Japanese "覚えておいて：..."). Other languages are found much
-  less reliably for now.
+- **Chinese and Japanese: search reads them; what reaches a prompt on its own still goes by words.** When an app
+  searches your memory, Chinese and Japanese are read by two models made for many languages (about 271 MB,
+  downloaded in the background the first time you save or ask something in either language; never otherwise). A
+  note asked about in different words is then found about as often as in English: 40 of 64 reworded questions in
+  our test, 39 of 59 for English, and 6 of 64 before 0.2.1. What is added to your prompt unasked, in Codex and
+  Claude Code, is held to a stricter cut: ask with the note's own words and it comes up (63 of 64); word the
+  question differently and it mostly does not (2 of 64), so ask the app to search. With a model set up, a Chinese
+  or Japanese question is also searched in English, one small model call each. A typed save needs "remember that
+  ..." (in Chinese "记住：...", in Japanese "覚えておいて：..."). Other languages are found much less reliably for
+  now.
 - **Saving is strongest from Claude Code.** In Codex, say "remember that ..."; in Cursor, the model has to call
   `remember`. Codex's own session files are read only if you run `dawnmere setup --codex-sessions`, or for one
   conversation when you type a handoff phrase in it.

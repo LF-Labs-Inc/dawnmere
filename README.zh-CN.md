@@ -24,7 +24,7 @@ curl -fsSL 'https://dawnmere.app/install?src=gh-readme' | sh
 ```
 
 **环境要求：** 搭载 Apple 芯片的 Mac，macOS 14 或更高版本，1 GB 可用磁盘空间，Node.js 18 或更高版本。免费，无需注册账号。<br>
-**注意：** 中文笔记在提问用到相同词语时能被找到；换一种说法常常找不到（[#27](https://github.com/LF-Labs-Inc/dawnmere/issues/27)）。<br>
+**关于中文：** 应用搜索记忆时，由能读中文的模型来找，换一种说法提问也能找到（自 0.2.1 起）。自动加入提示词的笔记，主要还是在提问用到相同词语时出现（[#27](https://github.com/LF-Labs-Inc/dawnmere/issues/27)）。<br>
 **状态：** 早期测试版（0.2）。客户端采用 MIT 许可，引擎源码可见（FSL，两年后转为 MIT）。由 [LF Labs](#who-makes-it-and-the-lf-labs-names) 开发。
 
 <!-- Apple silicon and macOS 14: install.sh:35-38 refuses anything else, and setup.py:73-74 checks macOS again.
@@ -179,7 +179,7 @@ sh install.sh
 | 步骤 | 做了什么 |
 | --- | --- |
 | Claude Code | 检查 `claude` 是否存在、是否已登录 |
-| 搜索模型 | 下载搜索模型（约 310 MB），并校验每个文件的大小和 sha256 |
+| 搜索模型 | 下载搜索模型（约 310 MB），并校验每个文件的大小和 sha256。中文和日文用的两个模型（约 271 MB）不在安装步骤里：第一次用其中一种语言保存或提问时才下载 |
 | 记忆服务 | 启动一个后台服务（LaunchAgent），让搜索保持快速 |
 | 你的应用 | 连接已安装的 Claude Code、Codex、Cursor 以及下面列出的其他应用 |
 | 你的笔记 | 导入你在 Claude Code 里的笔记 |
@@ -301,7 +301,7 @@ Dawnmere 由 LF Labs（GitHub 上的 [LF-Labs-Inc](https://github.com/LF-Labs-In
 
 - **只支持 Mac**：Apple 芯片，macOS 14 或更高版本。引擎用的 ONNX 运行时没有 Intel Mac 版本，也没有 Linux 或 Windows 版。
 - **只限一台 Mac。** 不在多台机器之间同步，也没有团队共享记忆。
-- **中文和日文的召回靠词语匹配。** 用中文或日文保存的笔记，只有在提问用到部分相同的词时才会自动加入提示；换一种说法提问常常找不到，但应用仍可主动搜索。如果设置了模型，中文或日文的问题也会用英文再搜一次，每次一个小的模型调用。直接输入保存要用 "remember that ..."，中文可以写 "记住：..."。其他语言目前找到的可靠性要低得多。
+- **中文和日文：搜索由多语言模型完成，自动加入提示词仍主要靠词语匹配。** 应用搜索记忆时，中文和日文由两个多语言模型来读（约 271 MB，第一次用其中一种语言保存或提问时在后台下载，其他情况下不会下载）。换一种说法提问，找到笔记的比例与英文相近：在我们的测试中，64 个换了说法的问题找到 40 个（英文是 59 个中的 39 个，0.2.1 之前是 64 个中的 6 个）。在 Codex 和 Claude Code 中自动加入提示词的笔记采用更严格的标准：用笔记里的词提问，它会出现（64 个中的 63 个）；换一种说法，大多不会出现（64 个中的 2 个），这时请让应用去搜索。如果设置了模型，中文或日文的问题也会用英文再搜一次，每次一个小的模型调用。直接输入保存要用 "remember that ..."，中文可以写 "记住：..."。其他语言目前找到的可靠性要低得多。
 - **从 Claude Code 保存效果最好。** 在 Codex 里要说 "remember that ..."；在 Cursor 里得由模型调用 `remember`。只有运行 `dawnmere setup --codex-sessions` 之后，才会读取 Codex 自己的会话文件；另外，你在某次 Codex 对话里输入交接用语时，会读取那一次对话。
 - **筛查是自动的，也会有漏网之鱼。** 用 `dawnmere export` 检查一下应用都存了什么。
 - **早期测试版。** 版本靠手动发布，更新也很频繁；更新前请先看 [release notes](https://github.com/LF-Labs-Inc/dawnmere/releases)。
