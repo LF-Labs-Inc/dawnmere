@@ -13,6 +13,7 @@
 <p align="center"><b>ひとつの AI に伝えれば、どの AI も知っている。</b><br>
 Mac の中のひとつのメモリを、Claude Code・Codex・Cursor で共有します。<br>
 <a href="https://dawnmere.app/?src=gh-readme">dawnmere.app</a></p>
+<p align="center"><a href="https://glama.ai/mcp/servers/LF-Labs-Inc/dawnmere"><img src="https://glama.ai/mcp/servers/LF-Labs-Inc/dawnmere/badges/score.svg" alt="Dawnmere MCP server on Glama"></a></p>
 
 <p align="center">
   <img src="assets/kip-loop.gif" width="800"
